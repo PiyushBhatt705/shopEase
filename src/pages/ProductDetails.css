@@ -1,0 +1,29 @@
+/* ProductDetails.css */
+@keyframes borderPulse {
+  0%, 100% {
+    border-color: transparent;
+    box-shadow: 0 0 0 0 rgba(59,130,246,0.1), 0 10px 25px rgba(0,0,0,0.15);
+  }
+  50% {
+    border-color: rgb(59,130,246);
+    box-shadow: 0 0 20px 3px rgba(59,130,246,0.4), 0 20px 40px rgba(0,0,0,0.3);
+  }
+}
+
+.detail-image {
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+.detail-image:hover {
+  animation: borderPulse 2s ease-in-out infinite;
+  transform: translateY(-4px);
+}
+
+.thumb-image {
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+.thumb-image:hover {
+  animation: borderPulse 2s ease-in-out infinite;
+  transform: translateY(-2px);
+}
