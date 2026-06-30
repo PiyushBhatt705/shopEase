@@ -1,6 +1,7 @@
   import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Toast from "../components/Toast";
+import { apiService } from "../services/apiService";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,31 +20,18 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const user = JSON.parse(
-      localStorage.getItem("userData")
-    );
-
-    if (!user) {
-      setToast("No account found. Please signup first.");
-      return;
-    }
-
-    if (
-      user.email === formData.email &&
-      user.password === formData.password
-    ) {
+    try {
+      const loggedUser = await apiService.auth.login(formData.email, formData.password);
       localStorage.setItem("isLoggedIn", "true");
-
+      localStorage.setItem("userData", JSON.stringify(loggedUser));
       setToast("Login Successful 🚀");
-
       setTimeout(() => {
         navigate("/");
       }, 1500);
-    } else {
-      setToast("Invalid Email or Password");
+    } catch (err) {
+      setToast(err.message || "Invalid Email or Password");
     }
   };
 

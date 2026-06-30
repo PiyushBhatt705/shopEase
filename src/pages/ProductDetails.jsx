@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ShoppingBag } from 'lucide-react'
+import { ShoppingBag, Heart, MessageSquare, Send } from 'lucide-react'
 import Button from '../components/Button'
 import Toast from '../components/Toast'
 import {useCart} from '../hooks/useCart'
@@ -14,25 +14,113 @@ const ProductDetails = () => {
 
   const [product, setProduct] = useState(null)
   const [selectedImage, setSelectedImage] = useState(null)
+  const [wishlist, setWishlist] = useState([])
+  const [reviews, setReviews] = useState([])
+  const [ratingInput, setRatingInput] = useState(5)
+  const [commentInput, setCommentInput] = useState("")
+
+  // Wishlist logic
+  useEffect(() => {
+    const saved = localStorage.getItem("wishlist");
+    if (saved) {
+      setWishlist(JSON.parse(saved));
+    }
+  }, []);
+
+  const isWishlisted = (id) => wishlist.some((item) => item.id === id);
+
+  const toggleWishlist = () => {
+    let updated;
+    if (isWishlisted(product.id)) {
+      updated = wishlist.filter((item) => item.id !== product.id);
+      setToast("Removed from wishlist 💔");
+    } else {
+      updated = [...wishlist, product];
+      setToast("Added to wishlist ❤️");
+    }
+    setWishlist(updated);
+    localStorage.setItem("wishlist", JSON.stringify(updated));
+    window.dispatchEvent(new Event("wishlistUpdate"));
+    setTimeout(() => setToast(null), 2000);
+  };
+
+  // Review logic
+  useEffect(() => {
+    if (product?.id) {
+      const saved = localStorage.getItem(`reviews_${product.id}`);
+      if (saved) {
+        setReviews(JSON.parse(saved));
+      } else {
+        const defaults = [
+          { name: "Jessica T.", rating: 5, comment: "Absolutely love it! Exceeded my expectations. Build quality is solid.", date: "2026-06-15" },
+          { name: "Mark D.", rating: 4, comment: "Very good product. Delivery took one day longer, but overall satisfied.", date: "2026-06-18" }
+        ];
+        setReviews(defaults);
+        localStorage.setItem(`reviews_${product.id}`, JSON.stringify(defaults));
+      }
+    }
+  }, [product]);
+
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (!isLoggedIn) {
+      setToast("Please login first to submit a review ⚠️");
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
+
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const newReview = {
+      name: userData?.name || "Verified Customer",
+      rating: ratingInput,
+      comment: commentInput,
+      date: new Date().toISOString().split("T")[0]
+    };
+
+    const updated = [newReview, ...reviews];
+    setReviews(updated);
+    localStorage.setItem(`reviews_${product.id}`, JSON.stringify(updated));
+    setCommentInput("");
+    setToast("Review submitted! Thank you ⭐");
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
-    fetch(`https://api.escuelajs.co/api/v1/products/${id}`)
-      .then((res) => res.json())
+    apiService.products.getById(id)
       .then((data) => {
-        const cleanedImages = (data.images || []).map((img) => {
-          try {
-            const parsed = JSON.parse(img)
-            return typeof parsed === 'string' ? parsed : img
-          } catch {
-            return img.replace(/[\[\]"']/g, '')
-          }
-        })
-
-        const finalProduct = { ...data, images: cleanedImages }
-        setProduct(finalProduct)
+        if (data) {
+          const finalProduct = {
+            ...data,
+            id: id,
+            images: data.images || [data.thumbnail]
+          };
+          setProduct(finalProduct);
+        } else {
+          // Fallback to Platzi Fake Store API directly
+          fetch(`https://api.escuelajs.co/api/v1/products/${id}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(platziData => {
+              if (platziData) {
+                const cleanedImages = (platziData.images || []).map((img) => {
+                  try {
+                    const parsed = JSON.parse(img);
+                    return typeof parsed === 'string' ? parsed : img;
+                  } catch {
+                    return img.replace(/[\[\]"']/g, '');
+                  }
+                });
+                setProduct({
+                  ...platziData,
+                  id: id,
+                  images: cleanedImages
+                });
+              }
+            });
+        }
       })
-      .catch((err) => console.log(err))
-  }, [id])
+      .catch((err) => console.log(err));
+  }, [id]);
 
   useEffect(() => {
     if (product?.images?.length > 0) {
@@ -117,22 +205,120 @@ const ProductDetails = () => {
             <span className="text-gray-600 text-sm">(120 reviews)</span>
           </div>
 
-          {/* Button */}
-          <button
-           className="mt-4 w-full cursor-pointer bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition-all duration-300 flex items-center justify-center gap-2"
-           onClick={(e) => {
-            e.stopPropagation()
-            addToCart(product)
-            setToast("Added to cart 🛒")
-            setTimeout(() => setToast(null),3000)
-           }}
-           >
-            <ShoppingBag size={18} />
-            Add to Cart
-          </button>
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-4">
+            <button
+             className="flex-1 cursor-pointer bg-gray-100 border border-gray-200 text-gray-800 py-3.5 rounded-xl hover:bg-blue-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-300 flex items-center justify-center gap-2 font-bold scale-hover shadow-sm"
+             onClick={(e) => {
+              e.stopPropagation()
+              addToCart(product)
+              setToast("Added to cart 🛒")
+              setTimeout(() => setToast(null),3000)
+             }}
+             >
+              <ShoppingBag size={18} />
+              Add to Cart
+            </button>
+
+            <button
+             className="flex-1 cursor-pointer bg-black hover:bg-blue-600 text-white py-3.5 rounded-xl transition duration-300 flex items-center justify-center gap-2 font-bold scale-hover shadow-md btn-glow"
+             onClick={(e) => {
+              e.stopPropagation()
+              navigate("/checkout", { state: { buyNowProduct: product } })
+             }}
+             >
+              Buy Now
+            </button>
+
+            <button
+             onClick={toggleWishlist}
+             className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all scale-hover flex items-center justify-center shadow-xs cursor-pointer"
+             title={isWishlisted(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
+             >
+              <Heart size={20} fill={isWishlisted(product.id) ? "red" : "none"} className={isWishlisted(product.id) ? "text-red-500" : "text-gray-500"} />
+            </button>
+          </div>
 
         </div>
       </div>  
+
+      {/* REVIEWS SECTION */}
+      <div className="mt-12 bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <MessageSquare size={22} className="text-blue-500" />
+          <span>Customer Reviews</span>
+        </h2>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Add Review Form */}
+          <div className="lg:col-span-4 bg-gray-50 border border-gray-100 p-5 rounded-xl space-y-4 h-fit">
+            <h3 className="font-bold text-gray-800 text-lg">Write a Review</h3>
+            
+            <form onSubmit={handleAddReview} className="space-y-4">
+              {/* Rating Input */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Select Rating</label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRatingInput(star)}
+                      className="text-2xl transition hover:scale-110 cursor-pointer"
+                    >
+                      {star <= ratingInput ? "⭐" : "☆"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comment Input */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Review Comments</label>
+                <textarea
+                  rows={3}
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                  placeholder="Share your thoughts about this product..."
+                  required
+                  className="w-full bg-white border border-gray-200 rounded-xl p-3 outline-none text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm scale-hover btn-glow text-sm"
+              >
+                <Send size={14} />
+                <span>Submit Review</span>
+              </button>
+            </form>
+          </div>
+
+          {/* Reviews List */}
+          <div className="lg:col-span-8 space-y-4 max-h-[400px] overflow-y-auto pr-1">
+            {reviews.length === 0 ? (
+              <p className="text-gray-500 text-center py-10">No reviews yet. Be the first to review this product!</p>
+            ) : (
+              reviews.map((rev, idx) => (
+                <div key={idx} className="bg-gray-50/50 border border-gray-100 p-4 rounded-xl space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="font-bold text-gray-800 text-sm block">{rev.name}</span>
+                      <span className="text-yellow-500 text-xs">
+                        {"⭐".repeat(rev.rating) + "☆".repeat(5 - rev.rating)}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-400 font-medium">{rev.date}</span>
+                  </div>
+                  <p className="text-sm text-gray-650 leading-relaxed font-medium">{rev.comment}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
       {toast && (
         <Toast
           message={toast}

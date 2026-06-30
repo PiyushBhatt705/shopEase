@@ -29,11 +29,9 @@
   0% {
     transform: translateY(0px);
   }
-
   50% {
     transform: translateY(-12px);
   }
-
   100% {
     transform: translateY(0px);
   }
@@ -47,11 +45,9 @@
   0% {
     background-position: 0% 50%;
   }
-
   50% {
     background-position: 100% 50%;
   }
-
   100% {
     background-position: 0% 50%;
   }
@@ -60,4 +56,326 @@
 .animated-gradient {
   background-size: 300% 300%;
   animation: gradientMove 10s ease infinite;
+}
+
+/* 🎨 PREMIUM MICRO-ANIMATIONS & HOVER EFFECTS */
+
+/* Navbar link slide-in underlines */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: #3b82f6;
+  transform-origin: bottom right;
+  transition: transform 0.25s cubic-bezier(0.86, 0, 0.07, 1);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Icon hover bouncy scale */
+.icon-bounce {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.icon-bounce:hover {
+  transform: translateY(-4px) scale(1.15);
+  color: #3b82f6;
+}
+
+/* Pop-out scaling buttons on hover */
+.scale-hover {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.scale-hover:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+.scale-hover:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Primary buttons hover glowing boxes */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transition: all 0.5s;
+}
+.btn-glow:hover {
+  box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.45);
+  transform: translateY(-2.5px);
+}
+.btn-glow:hover::before {
+  left: 100%;
+}
+.btn-glow:active {
+  transform: translateY(0.5px);
+  box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.3);
+}
+
+/* Red button danger glows */
+.btn-danger-glow {
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.btn-danger-glow:hover {
+  box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px);
+}
+.btn-danger-glow:active {
+  transform: translateY(0.5px);
+}
+
+/* Card lift and clean shadow expands */
+.card-zoom {
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.card-zoom:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12),
+              0 0 0 1px rgba(59, 130, 246, 0.1);
+}
+
+/* 🌓 MIDNIGHT DARK & 👑 IMPERIAL GOLD THEME OVERRIDES */
+
+/* Midnight Dark Theme Styles */
+body.dark-theme-active, 
+body.dark-theme-active main,
+body.dark-theme-active .bg-gray-50,
+body.dark-theme-active .bg-gray-100 {
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+}
+body.dark-theme-active .bg-white,
+body.dark-theme-active .bg-gray-50\/50,
+body.dark-theme-active .bg-gray-50\/70,
+body.dark-theme-active .bg-slate-50,
+body.dark-theme-active header {
+  background-color: #111827 !important;
+}
+body.dark-theme-active .text-gray-900,
+body.dark-theme-active .text-gray-850,
+body.dark-theme-active .text-gray-800,
+body.dark-theme-active .text-gray-700,
+body.dark-theme-active .text-gray-600 {
+  color: #f1f5f9 !important;
+}
+body.dark-theme-active .text-gray-500,
+body.dark-theme-active .text-gray-400 {
+  color: #9ca3af !important;
+}
+body.dark-theme-active .border-gray-100,
+body.dark-theme-active .border-gray-150,
+body.dark-theme-active .border-gray-200,
+body.dark-theme-active .border-gray-300,
+body.dark-theme-active .border {
+  border-color: #1f2937 !important;
+}
+body.dark-theme-active .form-input,
+body.dark-theme-active input[type="text"],
+body.dark-theme-active input[type="email"],
+body.dark-theme-active input[type="password"],
+body.dark-theme-active input[type="tel"],
+body.dark-theme-active input[type="number"],
+body.dark-theme-active select,
+body.dark-theme-active textarea {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+body.dark-theme-active .text-black {
+  color: #ffffff !important;
+}
+body.dark-theme-active .bg-gray-100 {
+  background-color: #1f2937 !important;
+}
+
+/* Imperial Gold Theme Styles */
+body.gold-theme-active, 
+body.gold-theme-active main,
+body.gold-theme-active .bg-gray-50,
+body.gold-theme-active .bg-gray-100 {
+  background-color: #09090b !important;
+  color: #f4f4f5 !important;
+}
+body.gold-theme-active .bg-white,
+body.gold-theme-active .bg-gray-50\/50,
+body.gold-theme-active .bg-gray-50\/70,
+body.gold-theme-active .bg-slate-50,
+body.gold-theme-active header {
+  background-color: #18181b !important;
+}
+body.gold-theme-active .text-gray-900,
+body.gold-theme-active .text-gray-850,
+body.gold-theme-active .text-gray-800,
+body.gold-theme-active .text-gray-700,
+body.gold-theme-active .text-gray-600 {
+  color: #f4f4f5 !important;
+}
+body.gold-theme-active .text-gray-500,
+body.gold-theme-active .text-gray-400 {
+  color: #a1a1aa !important;
+}
+body.gold-theme-active .border-gray-100,
+body.gold-theme-active .border-gray-150,
+body.gold-theme-active .border-gray-200,
+body.gold-theme-active .border-gray-300,
+body.gold-theme-active .border {
+  border-color: #27272a !important;
+}
+body.gold-theme-active .form-input,
+body.gold-theme-active input[type="text"],
+body.gold-theme-active input[type="email"],
+body.gold-theme-active input[type="password"],
+body.gold-theme-active input[type="tel"],
+body.gold-theme-active input[type="number"],
+body.gold-theme-active select,
+body.gold-theme-active textarea {
+  background-color: #18181b !important;
+  color: #fef3c7 !important;
+  border-color: #3f3f46 !important;
+}
+body.gold-theme-active .text-black {
+  color: #ffffff !important;
+}
+body.gold-theme-active .bg-gray-100 {
+  background-color: #27272a !important;
+}
+body.gold-theme-active .bg-blue-600,
+body.gold-theme-active .bg-blue-500,
+body.gold-theme-active .bg-cyan-500 {
+  background-color: #b45309 !important; /* Gold */
+}
+body.gold-theme-active .text-blue-600,
+body.gold-theme-active .text-blue-500,
+body.gold-theme-active .text-cyan-500 {
+  color: #f59e0b !important;
+}
+body.gold-theme-active .border-blue-500,
+body.gold-theme-active .border-blue-200 {
+  border-color: #b45309 !important;
+}
+body.gold-theme-active .text-green-600 {
+  color: #f59e0b !important;
+}
+body.gold-theme-active .bg-blue-50 {
+  background-color: #b45309/20 !important;
+  color: #fbbf24 !important;
+}
+
+/* Card & Image Container Dynamic Theme Styling */
+.product-card-image-wrapper {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+body.dark-theme-active .product-card-image-wrapper {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+body.gold-theme-active .product-card-image-wrapper {
+  background-color: #09090b !important;
+  border-color: #27272a !important;
+}
+
+/* Premium Gen-Z Button Styling */
+.product-card-btn {
+  background-color: #0f172a;
+  color: #ffffff;
+  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.product-card-btn:hover {
+  background-color: #2563eb;
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+  transform: scale(1.02);
+}
+body.dark-theme-active .product-card-btn {
+  background-color: #2563eb;
+}
+body.dark-theme-active .product-card-btn:hover {
+  background-color: #3b82f6;
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+body.gold-theme-active .product-card-btn {
+  background-color: #b45309;
+}
+body.gold-theme-active .product-card-btn:hover {
+  background-color: #d97706;
+  box-shadow: 0 10px 20px -5px rgba(217, 119, 6, 0.4);
+}
+
+/* Universal Premium Input Styling */
+.form-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.85rem 1.1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  border-radius: 1.0rem !important;
+  border: 1px solid #e5e7eb !important;
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  outline: none !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+.form-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 10px 15px -3px rgba(59, 130, 246, 0.05) !important;
+}
+body.dark-theme-active .form-input:focus,
+body.dark-theme-active input[type="text"]:focus,
+body.dark-theme-active input[type="email"]:focus,
+body.dark-theme-active input[type="password"]:focus,
+body.dark-theme-active input[type="tel"]:focus,
+body.dark-theme-active input[type="number"]:focus,
+body.dark-theme-active select:focus,
+body.dark-theme-active textarea:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.25) !important;
+}
+body.gold-theme-active .form-input:focus,
+body.gold-theme-active input[type="text"]:focus,
+body.gold-theme-active input[type="email"]:focus,
+body.gold-theme-active input[type="password"]:focus,
+body.gold-theme-active input[type="tel"]:focus,
+body.gold-theme-active input[type="number"]:focus,
+body.gold-theme-active select:focus,
+body.gold-theme-active textarea:focus {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.25) !important;
 }

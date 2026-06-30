@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Toast from "../components/Toast";
+import { apiService } from "../services/apiService";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const SignupPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const emailRegex =
@@ -48,24 +49,17 @@ const SignupPage = () => {
       return;
     }
 
-    const userData = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    };
-
-    localStorage.setItem(
-      "userData",
-      JSON.stringify(userData)
-    );
-
-    localStorage.setItem("isLoggedIn", "true");
-
-    setToast("Account Created Successfully 🚀");
-
-    setTimeout(() => {
-      navigate("/");
-    }, 2000);
+    try {
+      const createdUser = await apiService.auth.register(formData.name, formData.email, formData.password);
+      localStorage.setItem("userData", JSON.stringify(createdUser));
+      localStorage.setItem("isLoggedIn", "true");
+      setToast("Account Created Successfully 🚀");
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (err) {
+      setToast(err.message || "Failed to create account");
+    }
   };
 
   return (

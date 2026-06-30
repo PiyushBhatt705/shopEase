@@ -5,15 +5,18 @@ import Category from '../components/Category'
 import ProductCard from '../components/ProductCard'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import { apiService } from '../services/apiService'
 
 const Home = () => {
   const navigate = useNavigate()
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://api.escuelajs.co/api/v1/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
+    apiService.products.listAll()
+      .then((data) => {
+        setProducts(data || []);
+      })
+      .catch((err) => console.error(err));
   }, []);
   return (
     <div>

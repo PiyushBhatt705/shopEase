@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: shopease-api
+    runtime: node
+    rootDir: .
+    buildCommand: npm install
+    startCommand: node server/server.cjs
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: shopease-mongo
+          property: connectionString
+      - key: NODE_ENV
+        value: production

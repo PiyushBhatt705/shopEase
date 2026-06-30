@@ -140,20 +140,27 @@ const Cart = () => {
           Total: ${total}
         </h2>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
 
           <button
             onClick={clearCart}
-            className="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition"
+            className="cursor-pointer bg-red-500 text-white px-5 py-2.5 rounded-xl hover:bg-red-600 transition font-semibold btn-danger-glow"
           >
             Clear Cart
           </button>
 
           <button
             onClick={() => navigate("/")}
-            className="bg-black text-white px-5 py-2 rounded-xl hover:bg-gray-800 transition"
+            className="cursor-pointer bg-gray-200 text-gray-800 px-5 py-2.5 rounded-xl hover:bg-gray-300 transition font-semibold scale-hover shadow-xs"
           >
             Continue Shopping
+          </button>
+
+          <button
+            onClick={() => navigate("/checkout")}
+            className="cursor-pointer bg-blue-600 text-white px-6 py-2.5 rounded-xl hover:bg-blue-700 transition font-bold shadow-md hover:shadow-lg btn-glow"
+          >
+            Proceed to Checkout
           </button>
 
         </div>
