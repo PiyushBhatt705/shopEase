@@ -4,7 +4,7 @@ import { ShoppingBag, Heart, MessageSquare, Send } from 'lucide-react'
 import Button from '../components/Button'
 import Toast from '../components/Toast'
 import {useCart} from '../hooks/useCart'
-
+import { apiService } from '../services/apiService'
 
 const ProductDetails = () => {
   const { id } = useParams()

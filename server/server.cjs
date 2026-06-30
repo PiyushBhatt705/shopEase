@@ -17,7 +17,23 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://shopease-piyush-one.vercel.app',
+  'https://shopease-aaqd.onrender.com'
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Allow any vercel.app subdomain (preview deployments)
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    return callback(new Error('CORS: origin not allowed'));
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Local File Database Fallback Config
