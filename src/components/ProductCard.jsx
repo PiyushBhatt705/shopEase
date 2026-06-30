@@ -90,12 +90,11 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
               </button>
 
               <img
-                src={product.images?.[0] || product.thumbnail || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600"}
+                src={product.images?.[0] || product.thumbnail || ""}
                 alt={product.title}
                 loading="lazy"
                 onError={(e) => {
-                  e.target.src =
-                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600";
+                  e.target.src = "https://placehold.co/600x400/eeeeee/999999?text=No+Image";
                 }}
                 className="h-44 object-contain transition-all duration-700 ease-out group-hover:scale-110 group-hover:rotate-2"
               />
