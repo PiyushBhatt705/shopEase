@@ -584,3 +584,34 @@ body.gold-theme-active .animated-border-card-inner {
 .settings-toggle-checkbox:checked + .settings-toggle-label .settings-toggle-dot {
   transform: translateX(100%);
 }
+
+/* 🌀 DASHBOARD ENTRANCE ANIMATIONS */
+@keyframes slideUpDash {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleInDash {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up-dash {
+  animation: slideUpDash 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-in-dash {
+  animation: scaleInDash 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

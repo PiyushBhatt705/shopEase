@@ -198,133 +198,23 @@ const Navbar = () => {
           {/* Icons - Hidden on Mobile, visible on md and above */}
           <div className="hidden md:flex items-center space-x-3 lg:space-x-5">
             {/* User Account Dropdown (Flipkart / Amazon style) */}
-            <div 
-              className="relative group"
-              onMouseEnter={() => setOpenDropdown('user')}
-              onMouseLeave={() => setOpenDropdown(null)}
+            <Link 
+              to={isLoggedIn ? "/account" : "/login"}
+              className="flex items-center space-x-1.5 text-gray-700 hover:text-blue-500 font-semibold text-sm cursor-pointer transition py-1"
             >
-              <button 
-                className="flex items-center space-x-1.5 text-gray-700 hover:text-blue-500 font-semibold text-sm cursor-pointer transition py-1"
-                onClick={() => setOpenDropdown(openDropdown === 'user' ? null : 'user')}
-              >
-                <div className="p-1.5 bg-gray-100 rounded-full text-gray-650 hover:bg-blue-50 hover:text-blue-600 transition">
-                  <User size={18} />
-                </div>
-                <div className="text-left hidden lg:block">
-                  <p className="text-[10px] text-gray-400 font-extrabold leading-none uppercase flex items-center gap-1">
-                    Hello, {isLoggedIn ? (JSON.parse(localStorage.getItem("userData"))?.name?.split(" ")[0] || "User") : "Sign In"}
-                    {isSeller && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-sm shadow-blue-300" title="Verified Merchant Account"></span>}
-                  </p>
-                  <p className="text-xs font-extrabold flex items-center gap-0.5 mt-0.5">
-                    <span>Account</span>
-                    <ChevronDown size={12} />
-                  </p>
-                </div>
-              </button>
-
-              {openDropdown === 'user' && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-150 rounded-2xl shadow-xl z-35 py-2.5 animate-scale-in">
-                  {isLoggedIn ? (
-                    <>
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-[10px] text-gray-400 font-bold">WELCOME BACK</p>
-                        <div className="text-sm font-bold text-gray-800 truncate flex items-center gap-1.5 mt-0.5">
-                          {JSON.parse(localStorage.getItem("userData"))?.name || "User"}
-                          {isSeller && (
-                            <span className="bg-blue-50 text-blue-600 text-[8px] font-black px-1.5 py-0.5 rounded-sm border border-blue-100 uppercase tracking-wider flex items-center gap-0.5">
-                              <CheckCircle size={8} /> Merchant
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                        <div>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Wallet Balance</p>
-                          <p className="text-sm font-black text-gray-900">${walletBalance.toFixed(2)}</p>
-                        </div>
-                        {walletBalance > 0 && (
-                          <button 
-                            onClick={async () => {
-                              const user = JSON.parse(localStorage.getItem("userData"));
-                              await apiService.user.withdraw(user.id);
-                              setWalletBalance(0);
-                              setLatestToast("Funds withdrawn to bank account 🏦");
-                            }}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded cursor-pointer transition scale-hover shadow-sm"
-                          >
-                            Withdraw
-                          </button>
-                        )}
-                      </div>
-                      <Link 
-                        to="/wallet" 
-                        onClick={() => setOpenDropdown(null)} 
-                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-500 font-semibold transition"
-                      >
-                        💳 My Wallet & Top-up
-                      </Link>
-                      <Link 
-                        to="/orders" 
-                        onClick={() => setOpenDropdown(null)} 
-                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-500 font-semibold transition"
-                      >
-                        📦 My Orders
-                      </Link>
-                      <Link 
-                        to="/wishlist" 
-                        onClick={() => setOpenDropdown(null)} 
-                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-500 font-semibold transition"
-                      >
-                        ❤️ My Wishlist
-                      </Link>
-                       <Link 
-                        to="/manage-account" 
-                        onClick={() => setOpenDropdown(null)} 
-                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-500 font-semibold transition"
-                      >
-                        ⚙️ Account Hub & Radar
-                      </Link>
-                      <Link 
-                        to="/settings" 
-                        onClick={() => setOpenDropdown(null)} 
-                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-500 font-semibold transition"
-                      >
-                        🔧 Preferences & Security
-                      </Link>
-                      <Link 
-                        to="/become-seller" 
-                        onClick={() => setOpenDropdown(null)} 
-                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-500 font-semibold transition"
-                      >
-                        {isSeller ? "💼 Add Products" : "💼 Become a Seller"}
-                      </Link>
-                      <div className="border-t border-gray-100 mt-2 pt-2 px-2.5">
-                        <button
-                          onClick={() => {
-                            handleLogout();
-                            setOpenDropdown(null);
-                          }}
-                          className="w-full text-left px-3 py-2 text-sm text-red-650 hover:bg-red-50 rounded-xl font-bold transition cursor-pointer"
-                        >
-                          Logout
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="px-3 py-2 text-center space-y-2">
-                      <p className="text-xs text-gray-500 font-semibold">New Customer?</p>
-                      <Link
-                        to="/login"
-                        onClick={() => setOpenDropdown(null)}
-                        className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-xl text-center transition shadow-xs scale-hover btn-glow cursor-pointer"
-                      >
-                        Login / Sign Up
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+              <div className="p-1.5 bg-gray-100 rounded-full text-gray-650 hover:bg-blue-50 hover:text-blue-600 transition">
+                <User size={18} />
+              </div>
+              <div className="text-left hidden lg:block">
+                <p className="text-[10px] text-gray-400 font-extrabold leading-none uppercase flex items-center gap-1">
+                  Hello, {isLoggedIn ? (JSON.parse(localStorage.getItem("userData"))?.name?.split(" ")[0] || "User") : "Sign In"}
+                  {isSeller && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-sm shadow-blue-300" title="Verified Merchant Account"></span>}
+                </p>
+                <p className="text-xs font-extrabold flex items-center gap-0.5 mt-0.5">
+                  <span>Account</span>
+                </p>
+              </div>
+            </Link>
 
             {/* Wishlist Icon */}
             <Link 
@@ -449,7 +339,8 @@ const Navbar = () => {
             <Link to="/products?filter=deals" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer">Deals</Link>
             <Link to="/products?filter=new" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer">New Arrivals</Link>
             <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer">My Orders 📦</Link>
-            <Link to="/manage-account" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer font-semibold text-cyan-600">Account Hub & Radar 🛰️</Link>
+            <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer font-semibold text-cyan-600">Account Control Center 👾</Link>
+            <Link to="/manage-account" onClick={() => setMobileMenuOpen(false)} className="block text-slate-500 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer font-semibold">Account Hub & Radar 🛰️</Link>
             <Link to="/settings" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer font-semibold text-pink-650">Preferences & Security ⚙️</Link>
             <Link to="/track-order" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer font-semibold text-blue-600">Track Order 🚚</Link>
 

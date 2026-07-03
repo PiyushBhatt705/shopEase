@@ -17,6 +17,7 @@ import BecomeSeller from './pages/BecomeSeller'
 import DeliveredOrders from './pages/DeliveredOrders'
 import Wallet from './pages/Wallet'
 import ManageAccount from './pages/ManageAccount'
+import AccountDashboard from './pages/AccountDashboard'
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -206,6 +207,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ManageAccount />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/account"
+              element={
+                <ProtectedRoute>
+                  <AccountDashboard />
                 </ProtectedRoute>
               }
             />
