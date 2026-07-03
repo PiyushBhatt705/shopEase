@@ -128,7 +128,7 @@ const Checkout = () => {
     );
   };
 
-  // Auto-fill logged-in user data if available
+  // Auto-fill logged-in user data & poll wallet balance
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
@@ -140,13 +140,20 @@ const Checkout = () => {
           phone: userData.phone || "",
         }));
       }, 0);
-      if (userData.id) {
-        apiService.user.getWallet(userData.id).then(res => {
-          setTimeout(() => {
-            setWalletBalance(res.balance || 0);
-          }, 0);
-        }).catch(() => {});
-      }
+
+      const fetchWallet = () => {
+        if (userData.id) {
+          apiService.user.getWallet(userData.id)
+            .then(res => {
+              setWalletBalance(res.balance || 0);
+            })
+            .catch(() => {});
+        }
+      };
+
+      fetchWallet();
+      const interval = setInterval(fetchWallet, 2000);
+      return () => clearInterval(interval);
     }
   }, []);
 

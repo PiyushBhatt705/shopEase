@@ -932,9 +932,22 @@ app.get('/api/user/:id/wallet', async (req, res) => {
     }
   }
   const db = readLocalDb();
-  const user = db.users.find(u => u.id === id || u._id === id);
-  console.log(`[Wallet API] Local db lookup for user: ${id}, found: ${!!user}`);
-  res.json({ balance: user ? (user.walletBalance || 0) : 0 });
+  let user = db.users.find(u => u.id === id || u._id === id);
+  if (!user) {
+    // Auto-create user inside db.json to prevent wallet balance loss
+    user = {
+      id: id,
+      name: "ShopEase Member",
+      email: `member_${id.slice(-6)}@shopease.xyz`,
+      password: "hashed_fallback",
+      walletBalance: 0.00
+    };
+    db.users.push(user);
+    writeLocalDb(db);
+    console.log(`[Wallet API] Dynamically created fallback user profile in local db for ID: ${id}`);
+  }
+  console.log(`[Wallet API] Local db lookup for user: ${id}, balance: ${user.walletBalance}`);
+  res.json({ balance: user.walletBalance || 0 });
 });
 
 // 15. WITHDRAW FUNDS
@@ -956,12 +969,22 @@ app.post('/api/user/:id/withdraw', async (req, res) => {
     }
   }
   const db = readLocalDb();
-  const userIndex = db.users.findIndex(u => u.id === id || u._id === id);
-  if (userIndex !== -1) {
-    db.users[userIndex].walletBalance = 0;
-    writeLocalDb(db);
-    console.log(`[Withdraw API] Reset local wallet balance for user index: ${userIndex}`);
+  let userIndex = db.users.findIndex(u => u.id === id || u._id === id);
+  if (userIndex === -1) {
+    const newUser = {
+      id: id,
+      name: "ShopEase Member",
+      email: `member_${id.slice(-6)}@shopease.xyz`,
+      password: "hashed_fallback",
+      walletBalance: 0.00
+    };
+    db.users.push(newUser);
+    userIndex = db.users.length - 1;
+    console.log(`[Withdraw API] Dynamically created fallback user profile in local db for ID: ${id}`);
   }
+  db.users[userIndex].walletBalance = 0;
+  writeLocalDb(db);
+  console.log(`[Withdraw API] Reset local wallet balance for user index: ${userIndex}`);
   res.json({ success: true });
 });
 
@@ -985,14 +1008,23 @@ app.post('/api/user/:id/deposit', async (req, res) => {
     }
   }
   const db = readLocalDb();
-  const userIndex = db.users.findIndex(u => u.id === id || u._id === id);
-  if (userIndex !== -1) {
-    db.users[userIndex].walletBalance = (db.users[userIndex].walletBalance || 0) + depositAmount;
-    writeLocalDb(db);
-    console.log(`[Deposit API] Updated local wallet balance for user index: ${userIndex}`);
-    return res.json({ success: true, balance: db.users[userIndex].walletBalance });
+  let userIndex = db.users.findIndex(u => u.id === id || u._id === id);
+  if (userIndex === -1) {
+    const newUser = {
+      id: id,
+      name: "ShopEase Member",
+      email: `member_${id.slice(-6)}@shopease.xyz`,
+      password: "hashed_fallback",
+      walletBalance: 0.00
+    };
+    db.users.push(newUser);
+    userIndex = db.users.length - 1;
+    console.log(`[Deposit API] Dynamically created fallback user profile in local db for ID: ${id}`);
   }
-  res.json({ success: true, balance: depositAmount });
+  db.users[userIndex].walletBalance = (db.users[userIndex].walletBalance || 0) + depositAmount;
+  writeLocalDb(db);
+  console.log(`[Deposit API] Updated local wallet balance for user index: ${userIndex} to: $${db.users[userIndex].walletBalance}`);
+  return res.json({ success: true, balance: db.users[userIndex].walletBalance });
 });
 
 // 16. GET NOTIFICATIONS
