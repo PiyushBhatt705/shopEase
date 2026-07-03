@@ -16,9 +16,8 @@ const Cart = () => {
 
   const cartItems = cart || [];
 
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  const total = parseFloat(
+    cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)
   );
 
   if (cartItems.length === 0) {
@@ -137,7 +136,7 @@ const Cart = () => {
       <div className="mt-10 border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
 
         <h2 className="text-2xl font-bold">
-          Total: ${total}
+          Total: ${total.toFixed(2)}
         </h2>
 
         <div className="flex flex-wrap gap-3">

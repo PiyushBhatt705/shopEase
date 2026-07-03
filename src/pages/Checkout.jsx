@@ -151,14 +151,14 @@ const Checkout = () => {
   }, []);
 
   // Calculation
-  const subtotal = checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 100 || appliedCoupon === "FREESHIP" ? 0 : 10;
-  const discount = appliedCoupon === "EASE20" ? Math.round(subtotal * 0.20) : 0;
-  const tax = Math.round((subtotal - discount) * 0.08); // 8% simulated tax
-  const grandTotal = Math.max(0, subtotal - discount + shipping + tax);
+  const subtotal = parseFloat(checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2));
+  const shipping = subtotal > 100 || appliedCoupon === "FREESHIP" ? 0.00 : 10.00;
+  const discount = parseFloat((appliedCoupon === "EASE20" ? subtotal * 0.20 : 0.00).toFixed(2));
+  const tax = parseFloat(((subtotal - discount) * 0.08).toFixed(2)); // 8% simulated tax
+  const grandTotal = parseFloat(Math.max(0, subtotal - discount + shipping + tax).toFixed(2));
   const autoUseWallet = useWallet || paymentMethod === "wallet";
-  const walletDeduction = autoUseWallet ? Math.min(grandTotal, walletBalance) : 0;
-  const total = grandTotal - walletDeduction;
+  const walletDeduction = parseFloat((autoUseWallet ? Math.min(grandTotal, walletBalance) : 0.00).toFixed(2));
+  const total = parseFloat((grandTotal - walletDeduction).toFixed(2));
 
   const handleApplyCoupon = (e) => {
     e.preventDefault();
@@ -473,10 +473,10 @@ const Checkout = () => {
               <h2 className="text-xl font-bold text-gray-900">Shipping Details</h2>
             </div>
 
-            <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/5 to-pink-500/5 border border-cyan-500/10 rounded-xl flex items-center justify-between gap-4">
+            <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-indigo-500/5 border border-cyan-200 dark:border-cyan-900/30 rounded-2xl flex items-center justify-between gap-4">
               <div>
-                <h4 className="text-sm font-extrabold text-slate-800 flex items-center gap-1">Autodetect Delivery Radar 📍</h4>
-                <p className="text-[11px] text-slate-400 font-medium leading-relaxed">Use browser geolocation coordinates to reverse lookup your address instantly.</p>
+                <h4 className="text-sm font-extrabold text-cyan-600 dark:text-cyan-400 flex items-center gap-1">Autodetect Delivery Radar 📍</h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-300 font-semibold leading-relaxed">Use browser geolocation coordinates to reverse lookup your address instantly.</p>
               </div>
               <button
                 type="button"
@@ -840,21 +840,21 @@ const Checkout = () => {
             <div className="space-y-3 border-t pt-4 text-sm text-gray-600">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-semibold text-gray-800">${subtotal}</span>
+                <span className="font-semibold text-gray-800">${subtotal.toFixed(2)}</span>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-green-600 font-bold">
                   <span>Coupon Discount (20%)</span>
-                  <span>-${discount}</span>
+                  <span>-${discount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-semibold text-gray-800">{shipping === 0 ? "Free" : `$${shipping}`}</span>
+                <span className="font-semibold text-gray-800">{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax (Est. 8%)</span>
-                <span className="font-semibold text-gray-800">${tax}</span>
+                <span className="font-semibold text-gray-800">${tax.toFixed(2)}</span>
               </div>
 
               {useWallet && walletDeduction > 0 && (
@@ -865,7 +865,7 @@ const Checkout = () => {
               )}
               <div className="flex justify-between text-base font-bold text-gray-900 border-t pt-3 mt-3">
                 <span>Grand Total</span>
-                <span className="text-green-600">${total}</span>
+                <span className="text-green-600">${total.toFixed(2)}</span>
               </div>
             </div>
 
@@ -911,8 +911,8 @@ const Checkout = () => {
                 {paymentMethod === "cod" 
                   ? "Place COD Order" 
                   : paymentMethod === "wallet" 
-                    ? `Pay $${grandTotal} with Wallet` 
-                    : `Pay $${total}`}
+                    ? `Pay $${grandTotal.toFixed(2)} with Wallet` 
+                    : `Pay $${total.toFixed(2)}`}
               </span>
             </button>
 

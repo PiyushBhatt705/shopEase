@@ -298,9 +298,9 @@ app.post('/api/auth/register', async (req, res) => {
       const existing = await User.findOne({ email });
       if (existing) return res.status(400).json({ message: 'Email already exists' });
 
-      const newUser = new User({ name, email, password });
+      const newUser = new User({ name, email, password, walletBalance: 0.00 });
       await newUser.save();
-      return res.status(201).json({ id: newUser._id.toString(), name: newUser.name, email: newUser.email });
+      return res.status(201).json({ id: newUser._id.toString(), name: newUser.name, email: newUser.email, walletBalance: newUser.walletBalance || 0 });
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
@@ -310,10 +310,10 @@ app.post('/api/auth/register', async (req, res) => {
     if (db.users.some(u => u.email === email)) {
       return res.status(400).json({ message: 'Email already exists' });
     }
-    const newUser = { id: 'usr_' + Date.now(), name, email, password };
+    const newUser = { id: 'usr_' + Date.now(), name, email, password, walletBalance: 0.00 };
     db.users.push(newUser);
     writeLocalDb(db);
-    return res.status(201).json({ id: newUser.id, name: newUser.name, email: newUser.email });
+    return res.status(201).json({ id: newUser.id, name: newUser.name, email: newUser.email, walletBalance: newUser.walletBalance });
   }
 });
 
@@ -325,7 +325,7 @@ app.post('/api/auth/login', async (req, res) => {
     try {
       const user = await User.findOne({ email, password });
       if (!user) return res.status(400).json({ message: 'Invalid email or password' });
-      return res.json({ id: user._id.toString(), name: user.name, email: user.email });
+      return res.json({ id: user._id.toString(), name: user.name, email: user.email, walletBalance: user.walletBalance || 0 });
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
@@ -334,7 +334,7 @@ app.post('/api/auth/login', async (req, res) => {
     const db = readLocalDb();
     const user = db.users.find(u => u.email === email && u.password === password);
     if (!user) return res.status(400).json({ message: 'Invalid email or password' });
-    return res.json({ id: user.id, name: user.name, email: user.email });
+    return res.json({ id: user.id, name: user.name, email: user.email, walletBalance: user.walletBalance || 0 });
   }
 });
 
