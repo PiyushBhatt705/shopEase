@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MapPin,
   Phone,
   MessageSquare,
-  CheckCircle2,
   Package,
   Truck,
   Home,
   Navigation,
   Clock,
   ArrowLeft,
-  User,
-  ShieldCheck,
-  AlertCircle,
   Play,
-  RotateCcw,
   Sparkles,
-  Loader2
+  Loader2,
+  CheckCircle2
 } from "lucide-react";
 import Toast from "../components/Toast";
 import { apiService } from "../services/apiService";
@@ -29,7 +25,7 @@ const TrackOrder = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(0); // 0: Confirmed, 1: Shipped, 2: Out for Delivery, 3: Delivered
   const [isAutoSimulating, setIsAutoSimulating] = useState(true);
-  const [activeTab, setActiveTab] = useState("map"); // map, details
+
   const [callModal, setCallModal] = useState(false);
   const [chatModal, setChatModal] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
@@ -125,7 +121,9 @@ const TrackOrder = () => {
       logs[4].status = "done";
     }
 
-    setTimeLogs(logs);
+    setTimeout(() => {
+      setTimeLogs(logs);
+    }, 0);
   }, [order, currentStep]);
 
   const handleNextStep = async () => {
@@ -143,20 +141,7 @@ const TrackOrder = () => {
     }
   };
 
-  const handleResetSimulation = async () => {
-    if (order) {
-      try {
-        const updated = await apiService.orders.reset(order.orderId);
-        localStorage.setItem("activeOrder", JSON.stringify(updated));
-        window.dispatchEvent(new Event("ordersChanged"));
-        window.dispatchEvent(new Event("activeOrderChanged"));
-        setToast("Order tracking reset to Placed stage! 🔄");
-        setTimeout(() => setToast(""), 2000);
-      } catch (err) {
-        console.error("Failed to reset shipment:", err);
-      }
-    }
-  };
+  // handleResetSimulation was removed to prevent duplicate delivery notifications
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -187,13 +172,7 @@ const TrackOrder = () => {
     );
   }
 
-  // Delivery Stages Setup
-  const steps = [
-    { title: "Confirmed", icon: CheckCircle2, desc: "Order Accepted" },
-    { title: "Shipped", icon: Package, desc: "In Transit" },
-    { title: "On The Way", icon: Truck, desc: "Out for Delivery" },
-    { title: "Delivered", icon: Home, desc: "Handover Complete" }
-  ];
+
 
   if (isLoading) {
     return (
@@ -227,6 +206,36 @@ const TrackOrder = () => {
               className="bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-850 font-bold py-3.5 px-6 rounded-xl cursor-pointer transition scale-hover text-sm"
             >
               View Order History 📦
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (order.status === "delivered") {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-16 flex items-center justify-center min-h-[70vh]">
+        <div className="bg-white rounded-3xl border border-gray-150 p-10 text-center shadow-sm max-w-xl w-full">
+          <div className="w-24 h-24 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xs animate-bounce">
+            <CheckCircle2 size={44} className="text-emerald-500" />
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Order Delivered! 🎉</h2>
+          <p className="text-gray-500 mb-8 max-w-md mx-auto text-sm leading-relaxed font-medium">
+            This shipment has been successfully delivered and is no longer being tracked live. You can view the order's summary, items, and download receipt details in the Delivered History.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => navigate("/")}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl cursor-pointer transition shadow-md hover:shadow-lg scale-hover btn-glow text-sm"
+            >
+              Back to Shopping 🛍️
+            </button>
+            <button
+              onClick={() => navigate("/delivered-orders")}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-6 rounded-xl cursor-pointer transition shadow-md hover:shadow-lg scale-hover text-sm"
+            >
+              View Delivered History 📦
             </button>
           </div>
         </div>
@@ -298,13 +307,7 @@ const TrackOrder = () => {
             <span>Next Stage</span>
           </button>
 
-          <button
-            onClick={handleResetSimulation}
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 transition flex items-center gap-1.5 cursor-pointer scale-hover"
-          >
-            <RotateCcw size={14} />
-            <span>Restart</span>
-          </button>
+
 
           <button
             onClick={() => setIsAutoSimulating(!isAutoSimulating)}

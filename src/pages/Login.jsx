@@ -44,133 +44,101 @@ const Login = () => {
       />
     )}
 
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center px-4">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-black via-slate-950 to-purple-950 flex items-center justify-center px-4">
 
-      {/* Background Glow Effects */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+      {/* Floating Cyber Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-cyan-500/25 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-violet-600/15 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
 
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-
-      <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-pulse -translate-x-1/2 -translate-y-1/2"></div>
+      {/* Floating Sparkles & Slang Tags */}
+      <div className="absolute top-10 left-10 md:left-24 text-gray-500/30 text-xs sm:text-sm font-black tracking-widest uppercase select-none genz-animate-float">
+        ✨ NO CAP SHOPPING ✨
+      </div>
+      <div className="absolute bottom-10 right-10 md:right-24 text-gray-500/30 text-xs sm:text-sm font-black tracking-widest uppercase select-none genz-animate-float" style={{ animationDelay: '2s' }}>
+        💅 GLOW UP THREADS 💅
+      </div>
 
       {/* Login Card */}
-      <div className="float-card w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
-
-        {/* Logo */}
+      <div className="genz-card-cyan w-full max-w-md rounded-3xl p-8 text-white relative z-10">
+        
+        {/* Glow Ring behind logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-white text-black flex items-center justify-center font-black text-2xl shadow-lg">
-            PB
+          <div className="relative group cursor-pointer">
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-pink-500 rounded-2xl blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+            <div className="relative w-16 h-16 rounded-2xl bg-black text-white border border-white/20 flex items-center justify-center font-black text-2xl">
+              <span className="genz-gradient-text">SE</span>
+            </div>
           </div>
         </div>
 
         {/* Heading */}
-        <h1 className="text-4xl font-extrabold text-center mb-2">
-          Welcome Back 👋
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-center mb-2 tracking-tight">
+          <span className="genz-gradient-text genz-text-glow">Main Character Energy ⚡</span>
         </h1>
 
-        <p className="text-center text-gray-300 mb-8">
-          Login to continue shopping
+        <p className="text-center text-cyan-300/80 text-sm font-semibold tracking-wide mb-8">
+          Sign in to secure the haul 🛍️
         </p>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4"
+          className="space-y-5"
         >
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            className="
-              w-full
-              bg-white/5
-              border
-              border-white/20
-              rounded-xl
-              px-4
-              py-3
-              outline-none
-              text-white
-              placeholder-gray-400
-              transition-all
-              duration-300
-              focus:border-cyan-400
-              focus:ring-4
-              focus:ring-cyan-500/20
-              focus:scale-[1.02]
-            "
-          />
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase tracking-widest text-cyan-400 font-extrabold px-1">Your Digital Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="e.g. bestie@shopease.xyz"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full genz-input placeholder-slate-500 text-sm font-semibold"
+            />
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="
-              w-full
-              bg-white/5
-              border
-              border-white/20
-              rounded-xl
-              px-4
-              py-3
-              outline-none
-              text-white
-              placeholder-gray-400
-              transition-all
-              duration-300
-              focus:border-cyan-400
-              focus:ring-4
-              focus:ring-cyan-500/20
-              focus:scale-[1.02]
-            "
-          />
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase tracking-widest text-pink-400 font-extrabold px-1">Super Secret Key (Password)</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Make it spicy 🌶️"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full genz-input placeholder-slate-500 text-sm font-semibold focus:border-pink-500 focus:bg-pink-500/5 focus:shadow-[0_0_15px_rgba(236,72,153,0.2)]"
+            />
+          </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-1">
             <button
               type="button"
-              className="text-sm text-cyan-400 hover:text-cyan-300 transition"
+              className="text-xs text-pink-400 hover:text-pink-300 font-extrabold tracking-wide transition-colors"
             >
-              Forgot Password?
+              Forgot Key? 🧐
             </button>
           </div>
 
           <button
             type="submit"
-            className="
-              w-full
-              bg-white
-              text-black
-              font-bold
-              py-3
-              rounded-xl
-              cursor-pointer
-              transition-all
-              duration-300
-              hover:scale-105
-              hover:shadow-2xl
-              active:scale-95
-            "
+            className="w-full genz-btn-gradient py-3.5 mt-2 flex items-center justify-center gap-2 text-sm uppercase tracking-widest font-black shadow-lg"
           >
-            Login 🚀
+            LET ME IN 🚀
           </button>
         </form>
 
-        <p className="text-center mt-6 text-gray-300">
-          Don't have an account?
+        <p className="text-center mt-8 text-xs sm:text-sm text-slate-400 font-semibold">
+          Don't have a profile yet?
           <Link
             to="/signup"
-            className="text-cyan-400 font-semibold ml-2 hover:text-cyan-300"
+            className="text-cyan-400 font-bold ml-2 hover:text-cyan-300 underline underline-offset-4 decoration-2"
           >
-            Sign Up
+            Sign Up & Glow Up
           </Link>
         </p>
 
-        <div className="text-center mt-8">
-          <p className="text-xs tracking-[4px] text-gray-400">
-            MADE BY PIYUSH BHATT -⚡
+        <div className="text-center mt-8 border-t border-slate-800/80 pt-6">
+          <p className="text-[10px] tracking-[4px] text-slate-500 font-black">
+            POWERED BY ANTIGRAVITY - ⚡
           </p>
         </div>
 

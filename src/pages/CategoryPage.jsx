@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { apiService } from '../services/apiService';
+import { SearchX } from 'lucide-react';
 
 
 
@@ -20,7 +21,6 @@ const CategoryPage = () => {
       
       let djItems = [];
       let fsItems = [];
-      let pItems = [];
 
       try {
         // --- 1. GATHER PRODUCTS FROM DUMMYJSON ---
@@ -69,45 +69,8 @@ const CategoryPage = () => {
         console.warn("FakeStore query failed:", e.message);
       }
 
-      try {
-        // --- 3. GATHER PRODUCTS FROM PLATZI FAKE STORE API ---
-        let pUrl = "";
-        if (keyword === "shoes") pUrl = "https://api.escuelajs.co/api/v1/categories/4/products?limit=35";
-        else if (keyword === "furniture") pUrl = "https://api.escuelajs.co/api/v1/categories/3/products?limit=35";
-        else if (keyword === "men" || keyword === "women" || keyword === "kids" || keyword === "accessories") pUrl = "https://api.escuelajs.co/api/v1/categories/1/products?limit=35";
-        else if (keyword === "mobiles" || keyword === "laptops" || keyword === "watch" || keyword === "headphones") pUrl = "https://api.escuelajs.co/api/v1/categories/2/products?limit=35";
-        else pUrl = `https://api.escuelajs.co/api/v1/products?limit=100`;
-
-        const res3 = await fetch(pUrl);
-        const data3 = await res3.json();
-        const rawPlatzi = data3 || [];
-        
-        pItems = rawPlatzi
-          .filter(item => {
-            const title = (item.title || "").toLowerCase();
-            if (keyword === "headphones") return title.includes("headphone") || title.includes("audio") || title.includes("ear") || title.includes("sound");
-            if (keyword === "camera") return title.includes("camera") || title.includes("lens") || title.includes("photo");
-            if (keyword === "decor") return title.includes("decor") || title.includes("vase") || title.includes("lamp") || title.includes("mirror");
-            if (keyword === "kitchen") return title.includes("kitchen") || title.includes("mug") || title.includes("plate") || title.includes("pot");
-            return true;
-          })
-          .map(item => {
-            const cleanedImages = (item.images || []).map(img => {
-              try {
-                const parsed = JSON.parse(img);
-                return typeof parsed === "string" ? parsed : img;
-              } catch {
-                return img.replace(/[\[\]"']/g, "");
-              }
-            });
-            return { ...item, images: cleanedImages };
-          });
-      } catch (e) {
-        console.warn("Platzi query failed:", e.message);
-      }
-
       // --- 4. COMBINE AND DEDUPLICATE ---
-      let combinedApiItems = [...djItems, ...fsItems, ...pItems];
+      let combinedApiItems = [...djItems, ...fsItems];
       const seenTitles = new Set();
       combinedApiItems = combinedApiItems.filter(item => {
         const title = (item.title || "").toLowerCase();
@@ -115,8 +78,6 @@ const CategoryPage = () => {
         seenTitles.add(title);
         return true;
       });
-
-
 
       // --- 7. QUERY CUSTOM SELLER PRODUCTS FROM MONGO ---
       let sellerItems = [];
@@ -139,8 +100,18 @@ const CategoryPage = () => {
         console.error("Failed to query seller products for category:", err);
       }
 
-      // Merge seller items at the front so they display first!
-      setProducts([...sellerItems, ...combinedApiItems]);
+      const combined = [...sellerItems, ...combinedApiItems];
+      const seenIds = new Set();
+      const uniqueProducts = [];
+
+      for (const p of combined) {
+        if (p && p.id && !seenIds.has(p.id)) {
+          seenIds.add(p.id);
+          uniqueProducts.push(p);
+        }
+      }
+
+      setProducts(uniqueProducts);
       setLoading(false);
     };
 
@@ -149,17 +120,30 @@ const CategoryPage = () => {
 
   const pageTitle = subQuery
     ? `${subQuery.charAt(0).toUpperCase() + subQuery.slice(1)}`
-    : products[0]?.category || "Products";
+    : products[0]?.category || "Category";
 
   return (
-    <div className='max-w-7xl mx-auto px-4 py-12'>
-      <h1 className='text-4xl font-extrabold text-gray-900 text-center mb-10 capitalize tracking-tight'>{pageTitle} Collection</h1>
+    <div className='max-w-7xl mx-auto px-4 py-12 animate-fade-in'>
+      <h1 className='text-4xl font-extrabold text-gray-900 text-center mb-10 capitalize tracking-tight animate-slide-up'>{pageTitle} Collection</h1>
       {loading ? (
         <div className="flex justify-center py-20">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
         </div>
+      ) : products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-3xl animate-fade-in">
+          <div className="p-6 bg-white rounded-full shadow-sm mb-6">
+            <SearchX size={48} className="text-gray-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">No products found</h2>
+          <p className="text-gray-500 mb-8 max-w-md text-center">We couldn't find any products in the "{pageTitle}" category right now. Try exploring our other collections.</p>
+          <Link to="/" className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            Explore Homepage
+          </Link>
+        </div>
       ) : (
-        <ProductCard products={products} />
+        <div className="animate-slide-up" style={{animationDelay: '0.1s', animationFillMode: 'both'}}>
+          <ProductCard products={products} />
+        </div>
       )}
     </div>
   );

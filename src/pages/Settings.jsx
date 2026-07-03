@@ -1,574 +1,475 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Moon, Sun, Award, MapPin, Navigation, Map, Trash2, Plus, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, Bell, Lock, Shield, Eye, Trash2, HelpCircle, Save, Check, RefreshCw, Volume2, Sparkles, Smartphone } from "lucide-react";
 import Toast from "../components/Toast";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [toast, setToast] = useState("");
   
-  // Theme State
-  const [activeTheme, setActiveTheme] = useState(localStorage.getItem("theme") || "light");
-  
-  // Addresses State
-  const [addresses, setAddresses] = useState([]);
-  const [addressForm, setAddressForm] = useState({
-    fullName: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    phone: "",
-    lat: "12.9716",
-    lng: "77.5946"
+  // Notification States
+  const [notifications, setNotifications] = useState({
+    emailAlerts: true,
+    smsAlerts: false,
+    pushAlerts: true,
+    orderUpdates: true
   });
 
-  const [isLocating, setIsLocating] = useState(false);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [mapInstance, setMapInstance] = useState(null);
-  const [markerInstance, setMarkerInstance] = useState(null);
+  // Security States
+  const [twoFactor, setTwoFactor] = useState(false);
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  
+  const [activeSessions, setActiveSessions] = useState([
+    { id: "sess_1", device: "Chrome - Windows 11", location: "Mumbai, IN", time: "Active Now", current: true },
+    { id: "sess_2", device: "Safari - iPhone 15 Pro", location: "Bengaluru, IN", time: "2 hours ago", current: false },
+    { id: "sess_3", device: "ShopEase App - Android", location: "New Delhi, IN", time: "2 days ago", current: false }
+  ]);
 
-  // Initialize and load saved values
+  // Privacy States
+  const [privacy, setPrivacy] = useState({
+    profilePublic: false,
+    personalizedAds: true,
+    trackingCookies: true
+  });
+
+  // Gen-Z styling options
+  const [soundEffects, setSoundEffects] = useState(true);
+  const [accentColor, setAccentColor] = useState(localStorage.getItem("accentColor") || "cyan");
+
   useEffect(() => {
-    // Apply theme
-    applyThemeClass(activeTheme);
-    
-    // Load saved addresses
-    const saved = localStorage.getItem("addresses");
-    if (saved) {
-      setAddresses(JSON.parse(saved));
-    } else {
-      // Seed default addresses
-      const defaults = [
-        {
-          id: "addr_1",
-          fullName: "Rahul Sharma (Home)",
-          address: "Flat 405, Block C, Silver Oak Apartments, Outer Ring Road",
-          city: "Bengaluru",
-          state: "Karnataka",
-          zipCode: "560103",
-          phone: "+91 98765 43210",
-          lat: "12.9716",
-          lng: "77.5946"
-        }
-      ];
-      setAddresses(defaults);
-      localStorage.setItem("addresses", JSON.stringify(defaults));
-    }
-  }, []);
+    // Apply accent class to body if needed
+    document.body.setAttribute("data-accent", accentColor);
+  }, [accentColor]);
 
-  const applyThemeClass = (theme) => {
-    const body = document.body;
-    body.classList.remove("dark-theme-active", "gold-theme-active");
-    if (theme === "dark") {
-      body.classList.add("dark-theme-active");
-    } else if (theme === "gold") {
-      body.classList.add("gold-theme-active");
-    }
+  const handleNotificationToggle = (key) => {
+    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+    setToast("Notification preference saved! 🔔");
+    setTimeout(() => setToast(""), 1500);
   };
 
-  const handleThemeChange = (theme) => {
-    setActiveTheme(theme);
-    localStorage.setItem("theme", theme);
-    applyThemeClass(theme);
-    setToast(`Theme updated to ${theme.toUpperCase()}! ✨`);
-    setTimeout(() => setToast(""), 2000);
+  const handlePrivacyToggle = (key) => {
+    setPrivacy(prev => ({ ...prev, [key]: !prev[key] }));
+    setToast("Privacy configuration updated! 🔒");
+    setTimeout(() => setToast(""), 1500);
   };
 
-  // Load Leaflet CDN script & styles
-  useEffect(() => {
-    if (window.L) {
-      setMapLoaded(true);
-      return;
-    }
-
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.async = true;
-    script.onload = () => {
-      setMapLoaded(true);
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      try {
-        document.head.removeChild(link);
-        document.body.removeChild(script);
-      } catch (err) {
-        // Ignore removal
-      }
-    };
-  }, []);
-
-  const updateAddressFromCoords = (lat, lng) => {
-    const latitude = parseFloat(lat).toFixed(4);
-    const longitude = parseFloat(lng).toFixed(4);
-
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`)
-      .then((res) => res.json())
-      .then((data) => {
-        const addr = data.address || {};
-        const city = addr.city || addr.town || addr.village || addr.suburb || "Unknown City";
-        const state = addr.state || "Unknown State";
-        const zip = addr.postcode || "";
-        const displayAddress = data.display_name || `Location Near Lat ${latitude}, Lng ${longitude}`;
-
-        setAddressForm((prev) => ({
-          ...prev,
-          lat: latitude,
-          lng: longitude,
-          address: displayAddress,
-          city: city,
-          state: state,
-          zipCode: zip
-        }));
-      })
-      .catch((err) => {
-        console.error("Reverse geocode error:", err);
-        setAddressForm((prev) => ({
-          ...prev,
-          lat: latitude,
-          lng: longitude,
-          address: `Location Near Lat ${latitude}, Lng ${longitude}`
-        }));
-      });
+  const handleSessionRevoke = (id) => {
+    setActiveSessions(prev => prev.filter(sess => sess.id !== id));
+    setToast("Session successfully terminated! 🔴");
+    setTimeout(() => setToast(""), 1500);
   };
 
-  // Initialize Leaflet Map
-  useEffect(() => {
-    if (!mapLoaded || !window.L) return;
-
-    const initialLat = parseFloat(addressForm.lat) || 12.9716;
-    const initialLng = parseFloat(addressForm.lng) || 77.5946;
-
-    // Fix default marker icon path issue in Leaflet CDN
-    delete window.L.Icon.Default.prototype._getIconUrl;
-    window.L.Icon.Default.mergeOptions({
-      iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-      shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
-    });
-
-    const map = window.L.map("leaflet-map").setView([initialLat, initialLng], 13);
-    setMapInstance(map);
-
-    // Google Maps Roadmap tile layer
-    const googleStreets = window.L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-      attribution: '&copy; <a href="https://maps.google.com">Google Maps</a>'
-    });
-
-    // Google Maps Satellite/Hybrid tile layer
-    const googleSatellite = window.L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
-      attribution: '&copy; <a href="https://maps.google.com">Google Maps</a>'
-    });
-
-    // Default to Google Streets
-    googleStreets.addTo(map);
-
-    // Add Layer Control
-    const baseLayers = {
-      "Google Streets": googleStreets,
-      "Google Satellite": googleSatellite
-    };
-    window.L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
-
-    // Add marker
-    const marker = window.L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
-    setMarkerInstance(marker);
-
-    // Auto-pinpoint user's current location on mount if permitted
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const latitude = position.coords.latitude.toFixed(4);
-          const longitude = position.coords.longitude.toFixed(4);
-          map.setView([latitude, longitude], 13);
-          marker.setLatLng([latitude, longitude]);
-          updateAddressFromCoords(position.coords.latitude, position.coords.longitude);
-        },
-        () => {
-          // If denied, fallback to default Bengaluru values
-        }
-      );
-    }
-
-    // Update form when marker is dragged
-    marker.on("dragend", () => {
-      const position = marker.getLatLng();
-      updateAddressFromCoords(position.lat, position.lng);
-    });
-
-    // Update marker and form when map is clicked
-    map.on("click", (e) => {
-      const { lat, lng } = e.latlng;
-      marker.setLatLng([lat, lng]);
-      updateAddressFromCoords(lat, lng);
-    });
-
-    return () => {
-      map.remove();
-    };
-  }, [mapLoaded]);
-
-  // Browser Geolocation
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setToast("Geolocation is not supported by your browser ⚠️");
-      setTimeout(() => setToast(""), 2000);
-      return;
-    }
-
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const latitude = position.coords.latitude.toFixed(4);
-        const longitude = position.coords.longitude.toFixed(4);
-        
-        // If map is loaded, fly to position
-        if (mapInstance && markerInstance) {
-          mapInstance.flyTo([latitude, longitude], 15);
-          markerInstance.setLatLng([latitude, longitude]);
-        }
-
-        // Fetch actual reverse-geocode location details
-        updateAddressFromCoords(position.coords.latitude, position.coords.longitude);
-        
-        setIsLocating(false);
-        setToast("Location pinpointed! 📍");
-        setTimeout(() => setToast(""), 2000);
-      },
-      (error) => {
-        setIsLocating(false);
-        setToast("Unable to fetch location: Access denied or Timeout ⚠️");
-        setTimeout(() => setToast(""), 3000);
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
-    );
-  };
-
-  // Add Address Form Submit
-  const handleAddAddress = (e) => {
+  const handlePasswordSubmit = (e) => {
     e.preventDefault();
-    if (!addressForm.fullName.trim() || !addressForm.address.trim() || !addressForm.phone.trim()) {
-      setToast("Please fill in all details correctly ⚠️");
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      setToast("Please fill all password fields ⚠️");
       setTimeout(() => setToast(""), 2000);
       return;
     }
-
-    const newAddress = {
-      id: "addr_" + Date.now(),
-      ...addressForm
-    };
-
-    const updated = [...addresses, newAddress];
-    setAddresses(updated);
-    localStorage.setItem("addresses", JSON.stringify(updated));
-
-    // Reset Form
-    setAddressForm({
-      fullName: "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      phone: "",
-      lat: "12.9716",
-      lng: "77.5946"
-    });
-    setToast("Address saved successfully! 🏡");
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setToast("New passwords do not match! ❌");
+      setTimeout(() => setToast(""), 2000);
+      return;
+    }
+    setToast("Password updated successfully! 🚀");
+    setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    setShowPasswordChange(false);
     setTimeout(() => setToast(""), 2000);
   };
 
-  // Delete Address
-  const handleDeleteAddress = (id) => {
-    const updated = addresses.filter((addr) => addr.id !== id);
-    setAddresses(updated);
-    localStorage.setItem("addresses", JSON.stringify(updated));
-    setToast("Address deleted 🗑️");
-    setTimeout(() => setToast(""), 2000);
+  const handleAccentChange = (color) => {
+    setAccentColor(color);
+    localStorage.setItem("accentColor", color);
+    setToast(`Accent style changed to ${color.toUpperCase()}! 🎨`);
+    setTimeout(() => setToast(""), 1500);
+  };
+
+  const handleClearHistory = () => {
+    if (window.confirm("Are you sure you want to clear your local recommendation profile? This cannot be undone.")) {
+      setToast("Browsing profile and recommendations cleared! 🧹");
+      setTimeout(() => setToast(""), 2000);
+    }
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 relative">
       {toast && <Toast message={toast} onClose={() => setToast("")} />}
 
-      {/* Back to Home */}
+      {/* Back Link */}
       <button 
         onClick={() => navigate("/")}
-        className="flex items-center gap-2 text-gray-600 hover:text-black mb-6 font-medium transition cursor-pointer scale-hover hover:translate-x-[-3px]"
+        className="flex items-center gap-2 text-slate-500 hover:text-black dark:hover:text-white mb-6 font-semibold transition cursor-pointer scale-hover hover:translate-x-[-3px]"
       >
         <ArrowLeft size={18} />
         Back to Home
       </button>
 
-      <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-8">Settings & Profile</h1>
+      {/* Hero Title */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-extrabold tracking-tight mb-2">
+          <span className="genz-gradient-text genz-text-glow">Preferences & Security ⚙️</span>
+        </h1>
+        <p className="text-sm text-slate-500 font-medium">Fine-tune your app notification behaviors, security parameters, and privacy protocols.</p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* LEFT COLUMN: Theme settings */}
+        {/* LEFT COLUMN: Theme Vibe & Sound (Gen-Z Customization) */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white rounded-3xl border border-gray-150 p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Sun size={20} className="text-blue-500" />
-              <span>Theme Appearance</span>
+          
+          {/* Accent Color picker */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+              <Sparkles size={20} className="text-pink-500" />
+              <span>Glow Aesthetics</span>
             </h2>
-            <p className="text-xs text-gray-500 mb-6">Choose a theme to personalize your ShopEase workspace experience.</p>
+            <p className="text-xs text-slate-400 mb-5 font-semibold">Change your system highlight color to match your vibe.</p>
             
-            <div className="flex flex-col gap-3">
-              {/* Light Slate */}
-              <button
-                onClick={() => handleThemeChange("light")}
-                className={`flex items-center justify-between p-4 rounded-2xl border font-bold text-sm cursor-pointer transition ${
-                  activeTheme === "light" 
-                    ? "bg-slate-50 border-blue-500 text-blue-600 shadow-xs" 
-                    : "border-gray-200 hover:bg-gray-50 text-gray-700"
+            <div className="grid grid-cols-2 gap-3">
+              {/* Cyan Accent */}
+              <button 
+                onClick={() => handleAccentChange("cyan")}
+                className={`py-3 rounded-2xl border font-bold text-xs cursor-pointer transition ${
+                  accentColor === "cyan" 
+                    ? "bg-cyan-500 border-cyan-500 text-white shadow-md shadow-cyan-500/20" 
+                    : "border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-850"
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <Sun size={18} />
-                  <span>Light Slate (Default)</span>
-                </div>
-                {activeTheme === "light" && <Check size={16} />}
+                Electric Cyan
               </button>
 
-              {/* Midnight Dark */}
-              <button
-                onClick={() => handleThemeChange("dark")}
-                className={`flex items-center justify-between p-4 rounded-2xl border font-bold text-sm cursor-pointer transition ${
-                  activeTheme === "dark" 
-                    ? "bg-slate-900 border-blue-500 text-blue-400 shadow-xs" 
-                    : "border-gray-200 hover:bg-gray-50 text-gray-750"
+              {/* Pink Accent */}
+              <button 
+                onClick={() => handleAccentChange("pink")}
+                className={`py-3 rounded-2xl border font-bold text-xs cursor-pointer transition ${
+                  accentColor === "pink" 
+                    ? "bg-pink-500 border-pink-500 text-white shadow-md shadow-pink-500/20" 
+                    : "border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-850"
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <Moon size={18} />
-                  <span>Sleek Midnight (Dark)</span>
-                </div>
-                {activeTheme === "dark" && <Check size={16} />}
+                Bubblegum Pink
               </button>
 
-              {/* Imperial Gold */}
-              <button
-                onClick={() => handleThemeChange("gold")}
-                className={`flex items-center justify-between p-4 rounded-2xl border font-bold text-sm cursor-pointer transition ${
-                  activeTheme === "gold" 
-                    ? "bg-amber-950/20 border-amber-500 text-amber-500 shadow-xs" 
-                    : "border-gray-200 hover:bg-gray-50 text-gray-750"
+              {/* Green Accent */}
+              <button 
+                onClick={() => handleAccentChange("green")}
+                className={`py-3 rounded-2xl border font-bold text-xs cursor-pointer transition ${
+                  accentColor === "green" 
+                    ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20" 
+                    : "border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-850"
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <Award size={18} />
-                  <span>Imperial Gold (Luxury Dark)</span>
-                </div>
-                {activeTheme === "gold" && <Check size={16} />}
+                Acid Green
+              </button>
+
+              {/* Gold Accent */}
+              <button 
+                onClick={() => handleAccentChange("gold")}
+                className={`py-3 rounded-2xl border font-bold text-xs cursor-pointer transition ${
+                  accentColor === "gold" 
+                    ? "bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-500/20" 
+                    : "border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-850"
+                }`}
+              >
+                Sunset Gold
               </button>
             </div>
+
+            {/* Sound effects toggle */}
+            <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 mt-6 pt-5">
+              <div className="flex items-center gap-2">
+                <Volume2 size={16} className="text-slate-400" />
+                <div>
+                  <h4 className="font-extrabold text-xs text-slate-700 dark:text-slate-200">Interactive Sounds</h4>
+                  <p className="text-[10px] text-slate-400">Play snappy clicks on hover & purchase</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={soundEffects} 
+                  onChange={() => setSoundEffects(!soundEffects)}
+                  className="sr-only settings-toggle-checkbox" 
+                />
+                <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-850 transition duration-350 settings-toggle-label">
+                  <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform duration-350 absolute left-0.5 top-0.5 settings-toggle-dot"></div>
+                </div>
+              </label>
+            </div>
           </div>
+
+          {/* Quick FAQ info Card */}
+          <div className="bg-gradient-to-br from-slate-900 to-purple-950 rounded-3xl p-6 text-white border border-slate-800">
+            <h4 className="font-extrabold text-sm mb-2 flex items-center gap-1.5"><Shield size={16} className="text-pink-400" /> Privacy Shield Active</h4>
+            <p className="text-[11px] text-slate-300 leading-relaxed font-medium">
+              We practice full transparency. No cookies are shared with third-party advertising networks. Your radar and address settings are stored locally on your device storage.
+            </p>
+          </div>
+
         </div>
 
-        {/* RIGHT COLUMN: Address management with geolocation map picker */}
+        {/* RIGHT COLUMN: Toggles & Forms */}
         <div className="lg:col-span-8 space-y-6">
           
-          {/* Saved addresses list */}
-          <div className="bg-white rounded-3xl border border-gray-150 p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <MapPin size={20} className="text-blue-500" />
-              <span>Saved Delivery Addresses</span>
+          {/* NOTIFICATION PREFERENCES */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mb-5 flex items-center gap-2">
+              <Bell size={20} className="text-cyan-500" />
+              <span>Notification Preferences</span>
             </h2>
 
-            {addresses.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4 text-center">No addresses saved. Add one below!</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {addresses.map((addr) => (
-                  <div key={addr.id} className="border border-gray-150 rounded-2xl p-4 flex flex-col justify-between hover:shadow-xs relative">
-                    <button 
-                      onClick={() => handleDeleteAddress(addr.id)}
-                      className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition cursor-pointer"
-                      title="Delete Address"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                    
-                    <div className="space-y-1">
-                      <p className="font-bold text-gray-900 text-sm">{addr.fullName}</p>
-                      <p className="text-xs text-gray-500 leading-relaxed pr-6">{addr.address}</p>
-                      <p className="text-xs text-gray-500">{addr.city}, {addr.state} - {addr.zipCode}</p>
-                      <p className="text-xs text-gray-500 font-semibold pt-1">Phone: {addr.phone}</p>
-                    </div>
-
-                    <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center gap-1.5 text-[10px] text-gray-400">
-                      <Navigation size={12} className="text-blue-500" />
-                      <span>GPS Coordinates: {addr.lat}, {addr.lng}</span>
-                    </div>
+            <div className="divide-y divide-slate-100 dark:divide-slate-850">
+              {/* Item 1: Email alerts */}
+              <div className="flex items-center justify-between py-4 first:pt-0">
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Email Alerts & Promotions</h4>
+                  <p className="text-xs text-slate-400">Receive discount coupons, recommendations and newsletters.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={notifications.emailAlerts} 
+                    onChange={() => handleNotificationToggle("emailAlerts")}
+                    className="sr-only settings-toggle-checkbox" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-800 transition settings-toggle-label">
+                    <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform absolute left-0.5 top-0.5 settings-toggle-dot"></div>
                   </div>
-                ))}
+                </label>
               </div>
-            )}
+
+              {/* Item 2: SMS notifications */}
+              <div className="flex items-center justify-between py-4">
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">SMS Direct Updates</h4>
+                  <p className="text-xs text-slate-400">Receive direct alerts for high-priority flash discounts on mobile.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={notifications.smsAlerts} 
+                    onChange={() => handleNotificationToggle("smsAlerts")}
+                    className="sr-only settings-toggle-checkbox" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-800 transition settings-toggle-label">
+                    <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform absolute left-0.5 top-0.5 settings-toggle-dot"></div>
+                  </div>
+                </label>
+              </div>
+
+              {/* Item 3: Push alerts */}
+              <div className="flex items-center justify-between py-4">
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Browser Push Alerts</h4>
+                  <p className="text-xs text-slate-400">Receive real-time web notifications for cart items drops.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={notifications.pushAlerts} 
+                    onChange={() => handleNotificationToggle("pushAlerts")}
+                    className="sr-only settings-toggle-checkbox" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-800 transition settings-toggle-label">
+                    <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform absolute left-0.5 top-0.5 settings-toggle-dot"></div>
+                  </div>
+                </label>
+              </div>
+
+              {/* Item 4: Order status */}
+              <div className="flex items-center justify-between py-4 last:pb-0">
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Order Delivery Updates</h4>
+                  <p className="text-xs text-slate-400">Critical emails detailing package tracking and dispatch events.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={notifications.orderUpdates} 
+                    onChange={() => handleNotificationToggle("orderUpdates")}
+                    className="sr-only settings-toggle-checkbox" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-800 transition settings-toggle-label">
+                    <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform absolute left-0.5 top-0.5 settings-toggle-dot"></div>
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
 
-          {/* Add new address container with map selection */}
-          <div className="bg-white rounded-3xl border border-gray-150 p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">
-              <Plus size={18} className="text-blue-500" />
-              <span>Add New Delivery Location</span>
-            </h3>
+          {/* SECURITY CENTER */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mb-5 flex items-center gap-2">
+              <Lock size={20} className="text-cyan-500" />
+              <span>Security Protocols</span>
+            </h2>
 
-            {/* MAP & GEOLOCATOR CONTAINER */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-              
-              {/* Interactive OpenStreetMap Map Picker (7 cols) */}
-              <div className="md:col-span-7 space-y-3 z-10">
-                <div className="flex justify-between items-center text-xs font-semibold text-gray-500">
-                  <span className="flex items-center gap-1"><Map size={14} /> Drag marker or click map to set delivery address</span>
-                </div>
-
-                <div 
-                  id="leaflet-map"
-                  className="h-52 w-full bg-slate-100 border border-gray-200 rounded-2xl overflow-hidden relative shadow-inner z-10"
-                >
-                  {!mapLoaded && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-50 flex-col gap-2 z-20">
-                      <Loader2 className="animate-spin text-blue-600" size={24} />
-                      <span className="text-xs text-gray-500 font-semibold">Loading Map Street Layer...</span>
-                    </div>
-                  )}
-                </div>
+            {/* 2FA Toggle */}
+            <div className="flex items-center justify-between pb-5 border-b border-slate-100 dark:border-slate-850">
+              <div>
+                <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 flex items-center gap-1">Two-Factor Authentication (2FA) <span className="bg-slate-100 text-slate-500 dark:bg-slate-800 text-[9px] font-bold px-1.5 py-0.5 rounded">High Security</span></h4>
+                <p className="text-xs text-slate-400">Requires a temporal security code sent to your mail to login.</p>
               </div>
-
-              {/* Geolocator trigger card (5 cols) */}
-              <div className="md:col-span-5 bg-gray-50/50 border border-gray-150 p-4 rounded-2xl flex flex-col justify-between h-fit gap-4 self-end">
-                <div>
-                  <h4 className="font-bold text-gray-800 text-sm mb-1">Auto-Detect GPS</h4>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Uses your device's GPS to find your location and reverse-geocode address fields instantly.
-                  </p>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={twoFactor} 
+                  onChange={() => {
+                    setTwoFactor(!twoFactor);
+                    setToast(twoFactor ? "2FA Deactivated 🔓" : "2FA Activated successfully! 🔒");
+                    setTimeout(() => setToast(""), 1500);
+                  }}
+                  className="sr-only settings-toggle-checkbox" 
+                />
+                <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-800 transition settings-toggle-label">
+                  <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform absolute left-0.5 top-0.5 settings-toggle-dot"></div>
                 </div>
-                
+              </label>
+            </div>
+
+            {/* Change Password Trigger */}
+            <div className="py-5 border-b border-slate-100 dark:border-slate-850">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Account Access Credentials</h4>
+                  <p className="text-xs text-slate-400">Update your access password to protect inventory.</p>
+                </div>
                 <button
-                  type="button"
-                  onClick={handleUseCurrentLocation}
-                  disabled={isLocating}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl cursor-pointer transition flex items-center justify-center gap-1.5 shadow-sm scale-hover text-xs btn-glow"
+                  onClick={() => setShowPasswordChange(!showPasswordChange)}
+                  className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-cyan-500 hover:text-white transition font-extrabold text-xs px-4.5 py-2.5 rounded-xl cursor-pointer"
                 >
-                  {isLocating ? (
-                    <>
-                      <Loader2 className="animate-spin" size={14} />
-                      <span>Pinpointing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Navigation size={14} />
-                      <span>Use Current Location</span>
-                    </>
-                  )}
+                  {showPasswordChange ? "Hide Input" : "Update Password"}
                 </button>
               </div>
 
+              {/* Password update form */}
+              {showPasswordChange && (
+                <form onSubmit={handlePasswordSubmit} className="mt-4 bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <input 
+                      type="password"
+                      placeholder="Current password"
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs px-3.5 py-2.5 rounded-xl outline-none"
+                    />
+                    <input 
+                      type="password"
+                      placeholder="New password"
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs px-3.5 py-2.5 rounded-xl outline-none"
+                    />
+                    <input 
+                      type="password"
+                      placeholder="Verify new password"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs px-3.5 py-2.5 rounded-xl outline-none"
+                    />
+                  </div>
+                  <button 
+                    type="submit"
+                    className="bg-black dark:bg-slate-800 text-white font-extrabold text-xs py-2 px-5 rounded-lg hover:bg-cyan-600 cursor-pointer transition"
+                  >
+                    Save Password
+                  </button>
+                </form>
+              )}
             </div>
 
-            {/* FORM INPUTS */}
-            <form onSubmit={handleAddAddress} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Contact Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Rahul Sharma (Home)"
-                    value={addressForm.fullName}
-                    onChange={(e) => setAddressForm({ ...addressForm, fullName: e.target.value })}
-                    className="form-input"
-                  />
-                </div>
+            {/* Active Sessions list */}
+            <div className="pt-5">
+              <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-1.5">
+                <Smartphone size={16} className="text-slate-400" /> Active Logged-in Terminals
+              </h4>
+              <div className="space-y-3">
+                {activeSessions.map(sess => (
+                  <div key={sess.id} className="flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-850 text-xs bg-slate-50/50 dark:bg-slate-950/20">
+                    <div>
+                      <p className="font-extrabold text-slate-850 dark:text-slate-200">{sess.device}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{sess.location} • {sess.time}</p>
+                    </div>
+                    {sess.current ? (
+                      <span className="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 font-bold px-2 py-0.5 rounded text-[10px]">
+                        This Device
+                      </span>
+                    ) : (
+                      <button 
+                        onClick={() => handleSessionRevoke(sess.id)}
+                        className="text-[10px] text-red-500 hover:text-red-700 font-extrabold cursor-pointer transition"
+                      >
+                        Revoke Access
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Phone Number</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="+91 98765 43210"
-                    value={addressForm.phone}
-                    onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
-                    className="form-input"
-                  />
+          {/* PRIVACY CONTROLS */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mb-5 flex items-center gap-2">
+              <Eye size={20} className="text-cyan-500" />
+              <span>Data & Privacy Options</span>
+            </h2>
+
+            <div className="divide-y divide-slate-100 dark:divide-slate-850 text-xs">
+              <div className="flex items-center justify-between py-3.5 first:pt-0">
+                <div>
+                  <h4 className="font-bold text-slate-850 dark:text-slate-200">Personalized Product Recommendations</h4>
+                  <p className="text-slate-400 text-xs">Permit local machine learning algorithms to personalize shop items.</p>
                 </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={privacy.personalizedAds} 
+                    onChange={() => handlePrivacyToggle("personalizedAds")}
+                    className="sr-only settings-toggle-checkbox" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-800 transition settings-toggle-label">
+                    <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform absolute left-0.5 top-0.5 settings-toggle-dot"></div>
+                  </div>
+                </label>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Address Line</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Flat No, House No, Street name"
-                  value={addressForm.address}
-                  onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
-                  className="form-input"
-                />
+              <div className="flex items-center justify-between py-3.5">
+                <div>
+                  <h4 className="font-bold text-slate-850 dark:text-slate-200">Public profile details</h4>
+                  <p className="text-slate-400 text-xs">Make reviews and store status visible to other shoppers.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={privacy.profilePublic} 
+                    onChange={() => handlePrivacyToggle("profilePublic")}
+                    className="sr-only settings-toggle-checkbox" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-800 transition settings-toggle-label">
+                    <div className="w-3.5 h-3.5 bg-white rounded-full transition-transform absolute left-0.5 top-0.5 settings-toggle-dot"></div>
+                  </div>
+                </label>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase">City</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Bengaluru"
-                    value={addressForm.city}
-                    onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
-                    className="form-input"
-                  />
+              <div className="flex items-center justify-between py-3.5 last:pb-0">
+                <div>
+                  <h4 className="font-bold text-slate-850 dark:text-slate-200">Purge Browsing Profile Cache</h4>
+                  <p className="text-slate-400 text-xs">Deletes tracked clicks, cart predictions and mock profile telemetry.</p>
                 </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase">State</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Karnataka"
-                    value={addressForm.state}
-                    onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase">ZIP Code</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="560001"
-                    value={addressForm.zipCode}
-                    onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Coordinates</label>
-                  <input
-                    type="text"
-                    readOnly
-                    placeholder="Lat, Lng"
-                    value={`${addressForm.lat}, ${addressForm.lng}`}
-                    className="form-input bg-gray-50 text-gray-400 font-mono text-xs select-none"
-                  />
-                </div>
+                <button
+                  onClick={handleClearHistory}
+                  className="border border-red-200 dark:border-red-950/60 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 font-extrabold text-[10px] uppercase tracking-wider px-3.5 py-2.5 rounded-xl cursor-pointer transition flex items-center gap-1"
+                >
+                  <Trash2 size={12} /> Clear Cache
+                </button>
               </div>
-
-              <button
-                type="submit"
-                className="bg-black hover:bg-blue-600 text-white font-bold py-3.5 px-6 rounded-xl cursor-pointer transition shadow-md hover:shadow-lg flex items-center justify-center gap-1.5 text-sm scale-hover"
-              >
-                <Plus size={16} />
-                <span>Save New Address</span>
-              </button>
-            </form>
+            </div>
           </div>
 
         </div>

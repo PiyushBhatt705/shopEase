@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ShoppingBag, Heart, MessageSquare, Send } from 'lucide-react'
+import { ShoppingBag, Heart, MessageSquare, Send, AlertTriangle } from 'lucide-react'
 import Button from '../components/Button'
 import Toast from '../components/Toast'
 import {useCart} from '../hooks/useCart'
@@ -183,9 +183,28 @@ const ProductDetails = () => {
           </h1>
 
           {/* Price */}
-          <p className="text-2xl font-semibold text-green-600">
-            ${product.price}
-          </p>
+          <div className="flex items-baseline gap-3">
+            <p className="text-3xl font-black text-gray-900">
+              ${parseFloat(product.price || 0).toFixed(2)}
+            </p>
+            {(product.originalPrice && product.originalPrice > product.price) && (
+              <>
+                <p className="text-lg text-gray-400 line-through font-semibold">
+                  ${parseFloat(product.originalPrice).toFixed(2)}
+                </p>
+                <p className="text-xs text-green-600 font-bold bg-green-50 border border-green-100 px-2 py-1 rounded-lg uppercase tracking-wider">
+                  {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off
+                </p>
+              </>
+            )}
+          </div>
+          
+          {product.stock <= 10 && product.stock > 0 && (
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-150 w-fit uppercase tracking-wide shadow-sm animate-pulse">
+              <AlertTriangle size={13} className="text-amber-500" />
+              <span>Hurry, only {product.stock} items left in stock!</span>
+            </div>
+          )}
 
           {/* Description */}
           <p className="text-gray-600 leading-relaxed">

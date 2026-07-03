@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
-import { Heart } from "lucide-react";
+import { Heart, AlertTriangle } from "lucide-react";
 import Toast from "../components/Toast";
 
 const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" }) => {
@@ -9,6 +9,23 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
   const { addToCart } = useCart();
   const [toast, setToast] = useState(null);
   const [wishlist, setWishlist] = useState([]);
+  const [imageIndices, setImageIndices] = useState({});
+
+  const handleNextImage = (e, productId, totalImages) => {
+    e.stopPropagation();
+    setImageIndices(prev => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) + 1) % totalImages
+    }));
+  };
+
+  const handlePrevImage = (e, productId, totalImages) => {
+    e.stopPropagation();
+    setImageIndices(prev => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) - 1 + totalImages) % totalImages
+    }));
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("wishlist");
@@ -63,15 +80,17 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
         }
       `}</style>
 
-      <div className={`grid gap-8 ${gridClass}`}>
+      <div className={`grid gap-8 px-4 md:px-8 lg:px-12 ${gridClass}`}>
         {products.map((product, index) => (
           <div
             key={product.id}
             onClick={() => navigate(`/product/${product.id}`)}
-            className="group bg-white rounded-3xl overflow-hidden cursor-pointer shadow-xs hover:shadow-2xl border border-gray-100 hover:border-blue-500/30 transition-all duration-500 relative flex flex-col justify-between h-[420px]"
+            className="animated-border-card group cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500 animate-fade-in h-[420px]"
+            style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}
           >
-            {/* Image Header */}
-            <div className="relative product-card-image-wrapper p-6 flex items-center justify-center overflow-hidden h-60">
+            <div className="animated-border-card-inner flex flex-col justify-between overflow-hidden">
+              {/* Image Header */}
+              <div className="relative product-card-image-wrapper p-6 flex items-center justify-center overflow-hidden h-60">
               {(index % 4 === 0 || index % 5 === 0) && (
                 <span className="absolute top-3 left-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg z-10 shadow-md">
                   {badges[index % badges.length]}
@@ -89,20 +108,51 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
                 <Heart size={16} fill={isWishlisted(product.id) ? "red" : "none"} className={isWishlisted(product.id) ? "text-red-500" : "text-gray-500"} />
               </button>
 
-              <img
-                src={product.images?.[0] || product.thumbnail || ""}
-                alt={product.title}
-                loading="lazy"
-                onError={(e) => {
-                  e.target.src = "https://placehold.co/600x400/eeeeee/999999?text=No+Image";
-                }}
-                className="h-44 object-contain transition-all duration-700 ease-out group-hover:scale-110 group-hover:rotate-2"
-              />
+              <div className="relative w-full h-full flex justify-center items-center group/img">
+                <img
+                  src={product.images?.[imageIndices[product.id] || 0] || product.thumbnail || ""}
+                  alt={product.title}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.src = "https://placehold.co/600x400/eeeeee/999999?text=No+Image";
+                  }}
+                  className="h-44 object-contain transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-1"
+                />
+                
+                {product.images && product.images.length > 1 && (
+                  <>
+                    <button 
+                      onClick={(e) => handlePrevImage(e, product.id, product.images.length)}
+                      className="absolute left-1 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 rounded-full shadow-md opacity-0 group-hover/img:opacity-100 transition-opacity z-20 cursor-pointer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <button 
+                      onClick={(e) => handleNextImage(e, product.id, product.images.length)}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 rounded-full shadow-md opacity-0 group-hover/img:opacity-100 transition-opacity z-20 cursor-pointer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                    
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                      {product.images.map((_, i) => (
+                        <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === (imageIndices[product.id] || 0) ? 'bg-blue-600 scale-125' : 'bg-gray-300'}`} />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Content Body */}
             <div className="p-5 flex-grow flex flex-col justify-between">
               <div>
+                {product.stock <= 10 && product.stock > 0 && (
+                  <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-100 w-fit mb-2 uppercase tracking-wide shadow-sm">
+                    <AlertTriangle size={12} className="text-amber-500" />
+                    <span>Only {product.stock} left!</span>
+                  </div>
+                )}
                 <h3 className="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
                   {product.title}
                 </h3>
@@ -112,13 +162,18 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
                     ${parseFloat(product.price || 0).toFixed(2)}
                   </span>
 
-                  <span className="text-xs text-gray-400 line-through font-semibold">
-                    ${(parseFloat(product.price || 0) * 1.25).toFixed(2)}
-                  </span>
-                  
-                  <span className="text-[9px] text-green-600 font-bold bg-green-50 border border-green-100 px-1.5 py-0.5 rounded-md ml-auto uppercase tracking-wide">
-                    20% Off
-                  </span>
+                  {(product.originalPrice && product.originalPrice > product.price) ? (
+                    <>
+                      <span className="text-xs text-gray-400 line-through font-semibold">
+                        ${parseFloat(product.originalPrice).toFixed(2)}
+                      </span>
+                      <span className="text-[9px] text-green-600 font-bold bg-green-50 border border-green-100 px-1.5 py-0.5 rounded-md ml-auto uppercase tracking-wide">
+                        {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off
+                      </span>
+                    </>
+                  ) : (
+                    <div className="ml-auto" />
+                  )}
                 </div>
               </div>
 
@@ -132,6 +187,7 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
               >
                 Add to Cart
               </button>
+            </div>
             </div>
           </div>
         ))}

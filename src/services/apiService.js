@@ -49,6 +49,13 @@ export const apiService = {
         method: 'POST',
         body: JSON.stringify(productData)
       });
+    },
+
+    async update(productId, productData) {
+      return fetchJson(`${API_BASE_URL}/api/products/${productId}`, {
+        method: 'PUT',
+        body: JSON.stringify(productData)
+      });
     }
   },
 
@@ -72,6 +79,17 @@ export const apiService = {
     async deleteProduct(productId) {
       return fetchJson(`${API_BASE_URL}/api/products/${productId}`, {
         method: 'DELETE'
+      });
+    },
+
+    async getOrders(sellerId) {
+      return fetchJson(`${API_BASE_URL}/api/seller/orders/${sellerId}`);
+    },
+
+    async updateOrderStatus(orderId, status) {
+      return fetchJson(`${API_BASE_URL}/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status })
       });
     }
   },
@@ -116,6 +134,28 @@ export const apiService = {
       return fetchJson(`${API_BASE_URL}/api/orders/reset/${orderId}`, {
         method: 'POST'
       });
+    }
+  },
+
+  // 5. User Wallet & Notifications
+  user: {
+    async getWallet(userId) {
+      return fetchJson(`${API_BASE_URL}/api/user/${userId}/wallet`);
+    },
+    async withdraw(userId) {
+      return fetchJson(`${API_BASE_URL}/api/user/${userId}/withdraw`, { method: 'POST' });
+    },
+    async deposit(userId, amount) {
+      return fetchJson(`${API_BASE_URL}/api/user/${userId}/deposit`, {
+        method: 'POST',
+        body: JSON.stringify({ amount })
+      });
+    },
+    async getNotifications(userId) {
+      return fetchJson(`${API_BASE_URL}/api/notifications/${userId}`);
+    },
+    async markNotificationsRead(userId) {
+      return fetchJson(`${API_BASE_URL}/api/notifications/${userId}/read`, { method: 'POST' });
     }
   }
 };

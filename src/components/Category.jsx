@@ -43,20 +43,21 @@ const Category = () => {
           <div
             key={category.id}
             onClick={() => navigate(`/category/${category.id}`)}
-            className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 border border-transparent hover:border-blue-500"
+            className="animated-border-card group cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500"
           >
-            {/* Image */}
-            <div className="overflow-hidden bg-gray-100">
-              <img
-                src={category.image}
-                alt={category.name}
-                onError={(e) => {
-                  e.target.src =
-                    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800";
-                }}
-                className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-            </div>
+            <div className="animated-border-card-inner overflow-hidden rounded-3xl h-full flex flex-col">
+              {/* Image */}
+              <div className="overflow-hidden bg-gray-100 flex-grow">
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  onError={(e) => {
+                    e.target.src =
+                      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800";
+                  }}
+                  className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
 
             {/* Content */}
             <div className="p-4 text-center">
@@ -73,6 +74,7 @@ const Category = () => {
                   Explore →
                 </span>
               </div>
+            </div>
             </div>
           </div>
         ))}

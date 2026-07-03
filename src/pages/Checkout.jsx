@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
 import { 
@@ -8,9 +8,6 @@ import {
   Truck, 
   Lock, 
   MapPin, 
-  User, 
-  Phone, 
-  Mail, 
   CheckCircle2, 
   XCircle, 
   Loader2, 
@@ -25,6 +22,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { cart, clearCart } = useCart();
   const [toast, setToast] = useState("");
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
 
   // Determine if checking out a single item (Buy Now) or full cart
   const buyNowProduct = location.state?.buyNowProduct;
@@ -33,7 +32,9 @@ const Checkout = () => {
   // Redirect if no items to checkout
   useEffect(() => {
     if (checkoutItems.length === 0) {
-      setToast("Your cart is empty. Redirecting...");
+      setTimeout(() => {
+        setToast("Your cart is empty. Redirecting...");
+      }, 0);
       const timer = setTimeout(() => {
         navigate("/");
       }, 2000);
@@ -75,44 +76,76 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponStatus, setCouponStatus] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState("");
-  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [isLocatingAtCheckout, setIsLocatingAtCheckout] = useState(false);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("addresses");
-    if (saved) {
-      setSavedAddresses(JSON.parse(saved));
-    }
-  }, []);
-
-  const handleSelectAddress = (e) => {
-    const id = e.target.value;
-    if (!id) return;
-    const selected = savedAddresses.find((addr) => addr.id === id);
-    if (selected) {
-      setShippingForm((prev) => ({
-        ...prev,
-        fullName: selected.fullName,
-        phone: selected.phone,
-        address: selected.address,
-        city: selected.city,
-        state: selected.state,
-        zipCode: selected.zipCode
-      }));
-      setToast("Saved address loaded! 🏡");
+  const handleUseLocationAtCheckout = () => {
+    if (!navigator.geolocation) {
+      setToast("Geolocation is not supported by your browser ⚠️");
       setTimeout(() => setToast(""), 2000);
+      return;
     }
+
+    setIsLocatingAtCheckout(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(4);
+        const lng = position.coords.longitude.toFixed(4);
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
+          .then((res) => res.json())
+          .then((data) => {
+            const addr = data.address || {};
+            const city = addr.city || addr.town || addr.village || addr.suburb || "";
+            const state = addr.state || "";
+            const zip = addr.postcode || "";
+            const displayAddress = data.display_name || "";
+
+            setShippingForm((prev) => ({
+              ...prev,
+              address: displayAddress,
+              city: city,
+              state: state,
+              zipCode: zip
+            }));
+            setIsLocatingAtCheckout(false);
+            setToast("Radar address pinpointed! 📍");
+            setTimeout(() => setToast(""), 2000);
+          })
+          .catch((err) => {
+            console.error(err);
+            setIsLocatingAtCheckout(false);
+            setToast("Reverse-lookup failed, please enter manually ⚠️");
+            setTimeout(() => setToast(""), 2500);
+          });
+      },
+      (error) => {
+        setIsLocatingAtCheckout(false);
+        setToast("Unable to fetch location: Access denied ⚠️");
+        setTimeout(() => setToast(""), 3050);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   };
 
   // Auto-fill logged-in user data if available
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
-      setShippingForm((prev) => ({
-        ...prev,
-        fullName: userData.fullName || userData.name || "",
-        email: userData.email || "",
-        phone: userData.phone || "",
-      }));
+      setTimeout(() => {
+        setShippingForm((prev) => ({
+          ...prev,
+          fullName: userData.fullName || userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+        }));
+      }, 0);
+      if (userData.id) {
+        apiService.user.getWallet(userData.id).then(res => {
+          setTimeout(() => {
+            setWalletBalance(res.balance || 0);
+          }, 0);
+        }).catch(() => {});
+      }
     }
   }, []);
 
@@ -121,7 +154,10 @@ const Checkout = () => {
   const shipping = subtotal > 100 || appliedCoupon === "FREESHIP" ? 0 : 10;
   const discount = appliedCoupon === "EASE20" ? Math.round(subtotal * 0.20) : 0;
   const tax = Math.round((subtotal - discount) * 0.08); // 8% simulated tax
-  const total = Math.max(0, subtotal - discount + shipping + tax);
+  const grandTotal = Math.max(0, subtotal - discount + shipping + tax);
+  const autoUseWallet = useWallet || paymentMethod === "wallet";
+  const walletDeduction = autoUseWallet ? Math.min(grandTotal, walletBalance) : 0;
+  const total = grandTotal - walletDeduction;
 
   const handleApplyCoupon = (e) => {
     e.preventDefault();
@@ -229,6 +265,12 @@ const Checkout = () => {
       return;
     }
 
+    if (paymentMethod === "wallet" && walletBalance < grandTotal) {
+      setToast("Insufficient wallet balance for this purchase ⚠️");
+      setTimeout(() => setToast(""), 3000);
+      return;
+    }
+
     // Generate simulated transaction ID
     const txId = "TXN" + Math.floor(1000000000 + Math.random() * 9000000000);
     setTransactionId(txId);
@@ -241,30 +283,43 @@ const Checkout = () => {
 
     // Simulate connection delay
     setTimeout(() => {
-      if (paymentMethod === "cod") {
-        // Cash on delivery goes directly to processing then success
+      if (paymentMethod === "cod" || paymentMethod === "wallet") {
+        // Cash on delivery and wallet go directly to processing then success
         setGatewayStep("processing");
         setTimeout(async () => {
-          // Save order to database or local storage
-          const user = JSON.parse(localStorage.getItem("userData"));
-          const activeOrder = {
-            id: txId,
-            orderId: txId,
-            user_id: user?.id || "anonymous",
-            items: checkoutItems,
-            shipping_details: shippingForm,
-            amount: total,
-            discount: discount,
-            date: `${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-            status: "placed",
-            timestamp: Date.now()
-          };
-          localStorage.setItem("activeOrder", JSON.stringify(activeOrder));
-          await apiService.orders.create(activeOrder);
+          try {
+            // Save order to database or local storage
+            const user = JSON.parse(localStorage.getItem("userData"));
+            const activeOrder = {
+              id: txId,
+              orderId: txId,
+              user_id: user?.id || "anonymous",
+              items: checkoutItems,
+              shipping_details: shippingForm,
+              amount: grandTotal,
+              discount: discount,
+              date: `${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+              status: "placed",
+              timestamp: Date.now(),
+              useWallet: autoUseWallet,
+              userId: user?.id || "anonymous"
+            };
+            localStorage.setItem("activeOrder", JSON.stringify(activeOrder));
+            
+            try {
+              await apiService.orders.create(activeOrder);
+            } catch (err) {
+              console.error("Order creation api error, proceeding locally:", err);
+            }
 
-          setGatewayStep("success");
-          if (!buyNowProduct) {
-            clearCart();
+            setGatewayStep("success");
+            window.dispatchEvent(new Event("walletUpdate"));
+            if (!buyNowProduct) {
+              clearCart();
+            }
+          } catch (err) {
+            console.error("Checkout COD/Wallet error:", err);
+            setGatewayStep("success");
           }
         }, 1500);
       } else {
@@ -287,26 +342,39 @@ const Checkout = () => {
       if (simulationFail) {
         setGatewayStep("failure");
       } else {
-        // Save order to database or local storage
-        const user = JSON.parse(localStorage.getItem("userData"));
-        const activeOrder = {
-          id: transactionId,
-          orderId: transactionId,
-          user_id: user?.id || "anonymous",
-          items: checkoutItems,
-          shipping_details: shippingForm,
-          amount: total,
-          discount: discount,
-          date: `${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-          status: "placed",
-          timestamp: Date.now()
-        };
-        localStorage.setItem("activeOrder", JSON.stringify(activeOrder));
-        await apiService.orders.create(activeOrder);
+        try {
+          // Save order to database or local storage
+          const user = JSON.parse(localStorage.getItem("userData"));
+          const activeOrder = {
+            id: transactionId,
+            orderId: transactionId,
+            user_id: user?.id || "anonymous",
+            items: checkoutItems,
+            shipping_details: shippingForm,
+            amount: grandTotal,
+            discount: discount,
+            date: `${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+            status: "placed",
+            timestamp: Date.now(),
+            useWallet: autoUseWallet,
+            userId: user?.id || "anonymous"
+          };
+          localStorage.setItem("activeOrder", JSON.stringify(activeOrder));
 
-        setGatewayStep("success");
-        if (!buyNowProduct) {
-          clearCart();
+          try {
+            await apiService.orders.create(activeOrder);
+          } catch (err) {
+            console.error("Order creation api error, proceeding locally:", err);
+          }
+
+          setGatewayStep("success");
+          window.dispatchEvent(new Event("walletUpdate"));
+          if (!buyNowProduct) {
+            clearCart();
+          }
+        } catch (err) {
+          console.error("Checkout OTP error:", err);
+          setGatewayStep("success");
         }
       }
     }, 2000);
@@ -404,31 +472,30 @@ const Checkout = () => {
               <h2 className="text-xl font-bold text-gray-900">Shipping Details</h2>
             </div>
 
-            {savedAddresses.length > 0 && (
-              <div className="mb-6 p-4 bg-gray-50 border border-gray-100 rounded-xl space-y-2">
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">Use Saved Address</label>
-                <div className="flex gap-2 items-center">
-                  <select
-                    onChange={handleSelectAddress}
-                    defaultValue=""
-                    className="flex-1 bg-white border border-gray-200 rounded-xl p-2.5 outline-none text-xs font-semibold text-gray-700 cursor-pointer transition focus:border-blue-500"
-                  >
-                    <option value="" disabled>-- Select a saved address --</option>
-                    {savedAddresses.map((addr) => (
-                      <option key={addr.id} value={addr.id}>
-                        {addr.fullName} - {addr.address.slice(0, 30)}...
-                      </option>
-                    ))}
-                  </select>
-                  <Link 
-                    to="/settings"
-                    className="text-[10px] bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 font-bold px-3 py-2.5 rounded-xl transition whitespace-nowrap scale-hover"
-                  >
-                    Manage ⚙️
-                  </Link>
-                </div>
+            <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/5 to-pink-500/5 border border-cyan-500/10 rounded-xl flex items-center justify-between gap-4">
+              <div>
+                <h4 className="text-sm font-extrabold text-slate-800 flex items-center gap-1">Autodetect Delivery Radar 📍</h4>
+                <p className="text-[11px] text-slate-400 font-medium leading-relaxed">Use browser geolocation coordinates to reverse lookup your address instantly.</p>
               </div>
-            )}
+              <button
+                type="button"
+                onClick={handleUseLocationAtCheckout}
+                disabled={isLocatingAtCheckout}
+                className="bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 text-xs select-none shadow-sm cursor-pointer"
+              >
+                {isLocatingAtCheckout ? (
+                  <>
+                    <Loader2 className="animate-spin" size={14} />
+                    <span>Radar...</span>
+                  </>
+                ) : (
+                  <>
+                    <Navigation size={14} />
+                    <span>Detect Location</span>
+                  </>
+                )}
+              </button>
+            </div>
 
             <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
@@ -462,7 +529,7 @@ const Checkout = () => {
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="9876543210"
+                  placeholder="e.g. 555-0199"
                   value={shippingForm.phone}
                   onChange={handleShippingChange}
                   className="form-input"
@@ -533,38 +600,46 @@ const Checkout = () => {
               <h2 className="text-xl font-bold text-gray-900">Payment Option</h2>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-6">
               <button
                 type="button"
                 className={`payment-tab ${paymentMethod === "card" ? "active" : ""}`}
                 onClick={() => setPaymentMethod("card")}
               >
-                <CreditCard size={18} />
-                <span>Card</span>
+                <CreditCard size={16} />
+                <span className="text-xs">Card</span>
               </button>
               <button
                 type="button"
                 className={`payment-tab ${paymentMethod === "upi" ? "active" : ""}`}
                 onClick={() => setPaymentMethod("upi")}
               >
-                <Smartphone size={18} />
-                <span>UPI</span>
+                <Smartphone size={16} />
+                <span className="text-xs">UPI</span>
               </button>
               <button
                 type="button"
                 className={`payment-tab ${paymentMethod === "netbanking" ? "active" : ""}`}
                 onClick={() => setPaymentMethod("netbanking")}
               >
-                <Building2 size={18} />
-                <span>Net Banking</span>
+                <Building2 size={16} />
+                <span className="text-xs">NetBank</span>
               </button>
               <button
                 type="button"
                 className={`payment-tab ${paymentMethod === "cod" ? "active" : ""}`}
                 onClick={() => setPaymentMethod("cod")}
               >
-                <Truck size={18} />
-                <span>COD</span>
+                <Truck size={16} />
+                <span className="text-xs">COD</span>
+              </button>
+              <button
+                type="button"
+                className={`payment-tab ${paymentMethod === "wallet" ? "active" : ""}`}
+                onClick={() => setPaymentMethod("wallet")}
+              >
+                <Lock size={16} />
+                <span className="text-xs">Wallet</span>
               </button>
             </div>
 
@@ -690,6 +765,23 @@ const Checkout = () => {
                   <p className="text-sm mt-1">Pay with cash or UPI on your doorstep. A ₹10 shipping charge applies to orders under $100.</p>
                 </div>
               )}
+
+              {paymentMethod === "wallet" && (
+                <div className="text-center py-4 text-gray-650">
+                  <div className="mx-auto w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <h3 className="font-semibold text-gray-800">ShopEase Secure Wallet Payment</h3>
+                  <p className="text-sm mt-1">Available Balance: <span className="font-bold text-blue-600">${walletBalance.toFixed(2)}</span></p>
+                  {walletBalance < (subtotal - discount + shipping + tax) ? (
+                    <div className="mt-3 bg-amber-50 text-amber-800 p-2.5 rounded-xl border border-amber-200 text-xs font-semibold">
+                      ⚠️ Insufficient wallet balance for this purchase. Please select another payment option.
+                    </div>
+                  ) : (
+                    <p className="text-xs text-green-600 font-bold mt-2">✓ Full wallet payment covered!</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -764,11 +856,34 @@ const Checkout = () => {
                 <span className="font-semibold text-gray-800">${tax}</span>
               </div>
 
+              {useWallet && walletDeduction > 0 && (
+                <div className="flex justify-between text-blue-600 font-bold">
+                  <span>Wallet Applied</span>
+                  <span>-${walletDeduction.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-base font-bold text-gray-900 border-t pt-3 mt-3">
                 <span>Grand Total</span>
                 <span className="text-green-600">${total}</span>
               </div>
             </div>
+
+            {/* WALLET TOGGLE */}
+            {walletBalance > 0 && (
+              <div className="flex items-center gap-3 mt-4 p-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition">
+                <input
+                  id="wallet-toggle"
+                  type="checkbox"
+                  checked={useWallet}
+                  onChange={(e) => setUseWallet(e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500 h-4 w-4 cursor-pointer"
+                />
+                <label htmlFor="wallet-toggle" className="text-xs text-blue-800 font-bold cursor-pointer select-none flex-1">
+                  Pay with Wallet Balance
+                  <span className="block text-[10px] text-blue-600 font-semibold mt-0.5">${walletBalance.toFixed(2)} available</span>
+                </label>
+              </div>
+            )}
 
             {/* SIMULATE TOGGLE FOR FAIL */}
             <div className="flex items-center gap-2 mt-6 p-3 bg-red-50/50 hover:bg-red-50 border border-red-100 rounded-xl transition">
@@ -787,10 +902,17 @@ const Checkout = () => {
             {/* PAY NOW BUTTON */}
             <button
               onClick={handlePlaceOrder}
-              className="mt-4 w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl cursor-pointer hover:bg-blue-700 transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 btn-glow"
+              disabled={paymentMethod === "wallet" && walletBalance < grandTotal}
+              className="mt-4 w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl cursor-pointer hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 btn-glow"
             >
               <Lock size={16} />
-              <span>{paymentMethod === "cod" ? "Place COD Order" : `Pay $${total}`}</span>
+              <span>
+                {paymentMethod === "cod" 
+                  ? "Place COD Order" 
+                  : paymentMethod === "wallet" 
+                    ? `Pay $${grandTotal} with Wallet` 
+                    : `Pay $${total}`}
+              </span>
             </button>
 
             <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-gray-400">

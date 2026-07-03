@@ -14,6 +14,9 @@ import Wishlist from './pages/Wishlist'
 import Orders from './pages/Orders'
 import Settings from './pages/Settings'
 import BecomeSeller from './pages/BecomeSeller'
+import DeliveredOrders from './pages/DeliveredOrders'
+import Wallet from './pages/Wallet'
+import ManageAccount from './pages/ManageAccount'
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -183,10 +186,34 @@ function App() {
               }
             />
             <Route
+              path="/delivered-orders"
+              element={
+                <ProtectedRoute>
+                  <DeliveredOrders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/settings"
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manage-account"
+              element={
+                <ProtectedRoute>
+                  <ManageAccount />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wallet"
+              element={
+                <ProtectedRoute>
+                  <Wallet />
                 </ProtectedRoute>
               }
             />

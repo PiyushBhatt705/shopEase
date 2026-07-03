@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import Button from "../components/Button";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -6,22 +6,70 @@ import { apiService } from "../services/apiService";
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const searchQuery = searchParams.get("search") || "";
   const filterQuery = searchParams.get("filter") || "";
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLocalSearch(searchQuery);
+    }, 0);
+  }, [searchQuery]);
 
   // Sort & Filter States
   const [sortBy, setSortBy] = useState("default"); // default, priceLowHigh, priceHighLow, nameAZ
   const [maxPrice, setMaxPrice] = useState(1000);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    apiService.products.listAll()
-      .then((data) => {
-        setProducts(data || []);
-      })
-      .catch((err) => console.error(err));
+    const fetchAllProducts = async () => {
+      setLoading(true);
+      let customItems = [];
+      let fsItems = [];
+
+      try {
+        customItems = await apiService.products.listAll() || [];
+      } catch (err) {
+        console.error("Failed custom products:", err);
+      }
+
+      try {
+        const res = await fetch("https://fakestoreapi.com/products");
+        const data = await res.json();
+        fsItems = (data || []).map(p => ({ ...p, id: `fs_${p.id}`, images: [p.image] }));
+      } catch (err) {
+        console.error("Failed FakeStoreAPI:", err);
+      }
+
+      const combined = [...customItems, ...fsItems];
+      const seenIds = new Set();
+      const uniqueProducts = [];
+
+      for (const p of combined) {
+        if (p && p.id && !seenIds.has(p.id)) {
+          seenIds.add(p.id);
+          uniqueProducts.push(p);
+        }
+      }
+
+      // Sort: Merchant products first, then fake products
+      const sorted = uniqueProducts.sort((a, b) => {
+        const isMerchantA = !!(a.sellerId || a.seller_id);
+        const isMerchantB = !!(b.sellerId || b.seller_id);
+        if (isMerchantA && !isMerchantB) return -1;
+        if (!isMerchantA && isMerchantB) return 1;
+        return 0;
+      });
+
+      setProducts(sorted);
+      setLoading(false);
+    };
+
+    fetchAllProducts();
   }, []);
 
   // Filter products by search query
@@ -108,6 +156,28 @@ const AllProducts = () => {
         {/* SIDEBAR FILTERS - Left side (3 cols) */}
         <div className="lg:col-span-3 space-y-6">
           
+          {/* Search Catalog Box */}
+          <div className="bg-white p-5 rounded-2xl border border-gray-150 shadow-xs">
+            <h3 className="font-bold text-gray-800 text-sm uppercase tracking-wider mb-4">Search Catalog</h3>
+            <div className="relative">
+              <input
+                type="text"
+                value={localSearch}
+                onChange={(e) => {
+                  setLocalSearch(e.target.value);
+                  setSearchParams({ search: e.target.value, filter: filterQuery });
+                }}
+                placeholder="Type to search..."
+                className="w-full bg-gray-50 border border-gray-205 rounded-xl p-3 pl-10 outline-none text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 font-semibold text-gray-700 shadow-sm"
+              />
+              <span className="absolute left-3.5 top-3.5 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+            </div>
+          </div>
+          
           {/* Sorting Box */}
           <div className="bg-white p-5 rounded-2xl border border-gray-150 shadow-xs">
             <h3 className="font-bold text-gray-800 text-sm uppercase tracking-wider mb-4">Sort By</h3>
@@ -163,7 +233,12 @@ const AllProducts = () => {
 
         {/* PRODUCT GRID - Right side (9 cols) */}
         <div className="lg:col-span-9">
-          {filteredProducts.length === 0 ? (
+          {loading ? (
+             <div className="flex flex-col items-center justify-center py-20 text-blue-500">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+               <p className="font-semibold text-gray-500">Loading global catalog...</p>
+             </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-xs">
               <div className="text-gray-500 text-lg font-semibold py-10">
                 No products found matching your active price & category filters.
