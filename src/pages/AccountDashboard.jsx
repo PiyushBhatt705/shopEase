@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Wallet, ShoppingBag, Heart, Navigation, Key, ShieldCheck, ArrowRight, LogOut, CheckCircle2, ChevronRight, Loader2, Sparkles } from "lucide-react";
+import { User, Wallet, ShoppingBag, Heart, Navigation as NavigationIcon, Key, ShieldCheck, ArrowRight, LogOut, CheckCircle2, ChevronRight, Loader2, Sparkles } from "lucide-react";
 import Toast from "../components/Toast";
 import ProductCard from "../components/ProductCard";
 import { apiService } from "../services/apiService";
@@ -98,8 +98,11 @@ const AccountDashboard = () => {
     fetchWallet();
     fetchProducts();
 
-    const sellerInterval = setInterval(checkSellerStatus, 2000);
-    return () => clearInterval(sellerInterval);
+    const checkInterval = setInterval(() => {
+      checkSellerStatus();
+      fetchWallet();
+    }, 2000);
+    return () => clearInterval(checkInterval);
   }, [isLoggedIn, navigate]);
 
   // Handle category filter changes
@@ -303,7 +306,7 @@ const AccountDashboard = () => {
             >
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-cyan-50 dark:bg-cyan-950/30 text-cyan-600 dark:text-cyan-400 rounded-2xl group-hover:scale-110 transition duration-300">
-                  <Navigation size={20} />
+                  <NavigationIcon size={20} />
                 </div>
                 <div>
                   <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200">Radar & Addresses</h4>

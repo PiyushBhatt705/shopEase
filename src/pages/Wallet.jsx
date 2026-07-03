@@ -48,6 +48,11 @@ const Wallet = () => {
       setUser(userData);
       fetchWallet(userData.id);
       loadTransactionHistory(userData.id);
+      
+      const interval = setInterval(() => {
+        fetchWallet(userData.id);
+      }, 2000);
+      return () => clearInterval(interval);
     } else {
       setToast("Please login to view wallet 🔒");
       setTimeout(() => navigate("/login"), 2000);

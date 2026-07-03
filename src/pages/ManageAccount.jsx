@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Moon, Sun, Award, MapPin, Navigation, Map, Trash2, Plus, Check, Loader2, User, Globe, Cpu } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Award, MapPin, Navigation as NavigationIcon, Map, Trash2, Plus, Check, Loader2, User, Globe, Cpu } from "lucide-react";
 import Toast from "../components/Toast";
 
 const ManageAccount = () => {
@@ -452,7 +452,7 @@ const ManageAccount = () => {
                     </div>
 
                     <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-850 flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
-                      <Navigation size={12} className="text-cyan-500" />
+                      <NavigationIcon size={12} className="text-cyan-500" />
                       <span>GPS: {addr.lat}, {addr.lng}</span>
                     </div>
                   </div>
@@ -512,7 +512,7 @@ const ManageAccount = () => {
                     </>
                   ) : (
                     <>
-                      <Navigation size={14} />
+                      <NavigationIcon size={14} />
                       <span>Use Current Location</span>
                     </>
                   )}

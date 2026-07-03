@@ -7,7 +7,7 @@ import {
   Package,
   Truck,
   Home,
-  Navigation,
+  Navigation as NavigationIcon,
   Clock,
   ArrowLeft,
   Play,
@@ -330,7 +330,7 @@ const TrackOrder = () => {
           {/* VISUAL MAP ROUTE SIMULATION */}
           <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm overflow-hidden relative">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Navigation className="text-blue-500" size={20} />
+              <NavigationIcon className="text-blue-500" size={20} />
               <span>Real-Time Route Map</span>
             </h2>
 
@@ -436,7 +436,7 @@ const TrackOrder = () => {
                       currentStep === 2 ? "55px" : "110px"
                   }}
                 >
-                  <Navigation size={18} className="rotate-45 text-white animate-pulse" />
+                  <NavigationIcon size={18} className="rotate-45 text-white animate-pulse" />
                 </div>
               )}
             </div>

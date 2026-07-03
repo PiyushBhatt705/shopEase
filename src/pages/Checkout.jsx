@@ -12,7 +12,8 @@ import {
   XCircle, 
   Loader2, 
   ArrowLeft,
-  ShieldCheck
+  ShieldCheck,
+  Navigation as NavigationIcon
 } from "lucide-react";
 import Toast from "../components/Toast";
 import { apiService } from "../services/apiService";
@@ -490,7 +491,7 @@ const Checkout = () => {
                   </>
                 ) : (
                   <>
-                    <Navigation size={14} />
+                    <NavigationIcon size={14} />
                     <span>Detect Location</span>
                   </>
                 )}
