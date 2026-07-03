@@ -30,7 +30,7 @@ const AccountDashboard = () => {
       if (userData && userData.id) {
         try {
           const store = await apiService.seller.getStore(userData.id);
-          if (store) setIsSeller(true);
+          setIsSeller(!!store);
         } catch (err) {
           console.warn("Seller check failed:", err.message);
         }
@@ -97,6 +97,9 @@ const AccountDashboard = () => {
     checkSellerStatus();
     fetchWallet();
     fetchProducts();
+
+    const sellerInterval = setInterval(checkSellerStatus, 2000);
+    return () => clearInterval(sellerInterval);
   }, [isLoggedIn, navigate]);
 
   // Handle category filter changes

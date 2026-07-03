@@ -24,13 +24,15 @@ const Navbar = () => {
       if (user && user.id) {
         try {
           const store = await apiService.seller.getStore(user.id);
-          if (store) setIsSeller(true);
+          setIsSeller(!!store);
         } catch (err) {
           console.warn("Seller status check failed:", err.message);
         }
       }
     };
     checkSellerStatus();
+    const interval = setInterval(checkSellerStatus, 2000);
+    return () => clearInterval(interval);
   }, [isLoggedIn]);
 
   const { cart } = useCart();
