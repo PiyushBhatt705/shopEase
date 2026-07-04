@@ -4,6 +4,8 @@ import { apiService } from "../services/apiService";
 import { soundService } from "../services/soundService";
 import { useNavigate } from "react-router-dom";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const Chatbot = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +53,7 @@ const Chatbot = () => {
       if (userData && userData.id) {
         // Fetch current user details or fetch from db.json if exists
         try {
-          const res = await fetch(`http://localhost:5000/api/users/${userData.id}`);
+          const res = await fetch(`${BACKEND_URL}/api/users/${userData.id}`);
           if (res.ok) {
             const data = await res.json();
             return `💳 **Wallet Details**:\n\nAccount: **${data.name}**\nEmail: **${data.email}**\nActive Wallet Balance: **$${parseFloat(data.walletBalance || 0).toFixed(2)}**`;

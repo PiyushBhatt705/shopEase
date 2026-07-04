@@ -27,6 +27,8 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectRoute'
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function App() {
   const [deliveryToast, setDeliveryToast] = useState(null);
 
@@ -45,7 +47,6 @@ function App() {
 
   // ── Keep-Alive Ping (prevents Render backend from sleeping) ───────────────
   useEffect(() => {
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || "http://localhost:5000";
     const FOURTEEN_MINUTES = 14 * 60 * 1000;
 
     const ping = async () => {
@@ -72,7 +73,7 @@ function App() {
       if (!userData || !userData.id) return;
 
       try {
-        const res = await fetch(`http://localhost:5000/api/orders/active/${userData.id}`);
+        const res = await fetch(`${BACKEND_URL}/api/orders/active/${userData.id}`);
         if (!res.ok) return;
         const activeList = await res.json();
         
@@ -91,7 +92,7 @@ function App() {
           const missing = cachedActive.filter(id => !activeList.some(o => o.orderId === id));
           if (missing.length > 0) {
             // Retrieve details of the completed order to show toast
-            const dRes = await fetch(`http://localhost:5000/api/orders/delivered/${userData.id}`);
+            const dRes = await fetch(`${BACKEND_URL}/api/orders/delivered/${userData.id}`);
             if (dRes.ok) {
               const deliveredList = await dRes.json();
               const deliveredOrder = deliveredList.find(o => missing.includes(o.orderId));

@@ -125,7 +125,7 @@ const Login = () => {
             LET ME IN 🚀
           </button>
         </form>
-
+    
         <p className="text-center mt-8 text-xs sm:text-sm text-slate-400 font-semibold">
           Don't have a profile yet?
           <Link

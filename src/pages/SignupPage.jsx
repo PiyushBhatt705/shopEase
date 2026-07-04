@@ -92,7 +92,7 @@ const SignupPage = () => {
           <div className="relative group cursor-pointer">
             <div className="absolute -inset-1 bg-linear-to-r from-pink-500 to-violet-600 rounded-2xl blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
             <div className="relative w-16 h-16 rounded-2xl bg-black text-white border border-white/20 flex items-center justify-center font-black text-2xl">
-              <span className="genz-gradient-text">SE</span>
+              <span className="genz-gradient-text">PB</span>
             </div>
           </div>
         </div>

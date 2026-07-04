@@ -916,6 +916,40 @@ setInterval(async () => {
 
 
 
+// 13b. GET USER DETAILS
+app.get('/api/users/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log(`[User API] Fetching details for user: ${id}`);
+  if (isMongoConnected) {
+    try {
+      const user = await findUserById(id);
+      if (user) {
+        return res.json({
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          walletBalance: user.walletBalance || 0
+        });
+      }
+    } catch (err) {
+      console.error('[User API] Mongo user fetch error:', err.message);
+    }
+  }
+  
+  const db = readLocalDb();
+  const user = db.users.find(u => u.id === id || u._id === id);
+  if (user) {
+    return res.json({
+      id: user.id || user._id,
+      name: user.name,
+      email: user.email,
+      walletBalance: user.walletBalance || 0
+    });
+  }
+  
+  res.status(404).json({ message: 'User not found' });
+});
+
 // 14. GET WALLET BALANCE
 app.get('/api/user/:id/wallet', async (req, res) => {
   const { id } = req.params;
