@@ -138,7 +138,7 @@ const Login = () => {
 
         <div className="text-center mt-8 border-t border-slate-800/80 pt-6">
           <p className="text-[10px] tracking-[4px] text-slate-500 font-black">
-            POWERED BY ANTIGRAVITY - ⚡
+            POWERED BY PIYUSH BHATT - ⚡
           </p>
         </div>
 
