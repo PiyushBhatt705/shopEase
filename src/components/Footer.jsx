@@ -10,9 +10,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           
           {/* Column 1 - Logo, Tagline & Social Icons */}
-          <div className="flex flex-col items-start gap-4">
+          <div className="flex flex-col items-start gap-3">
             <Logo />
-            <p className="text-sm text-gray-500 leading-relaxed">
+            <p className="text-xs text-gray-400 font-bold tracking-widest uppercase mt-0.5">Developed by Piyush Bhatt</p>
+            <p className="text-sm text-gray-500 leading-relaxed mt-1">
               Your one-stop shop for all your needs.
             </p>
             <div className="flex flex-row gap-3 text-gray-500 mt-2">
@@ -93,8 +94,8 @@ const Footer = () => {
 
         {/* Bottom Section - Copyright & Payment Badges */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-500">
-            &copy; {new Date().getFullYear()} ShopEase. All Rights Reserved.
+          <p className="text-xs text-gray-500 font-medium">
+            &copy; {new Date().getFullYear()} ShopEase. All Rights Reserved. | Made with ❤️ by <span className="font-black text-blue-600 hover:underline">Piyush Bhatt</span>
           </p>
           
           {/* Payment Badges */}

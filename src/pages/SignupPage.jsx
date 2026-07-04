@@ -69,7 +69,7 @@ const SignupPage = () => {
           message={toast}
           onClose={() => setToast("")}
         />
-      )}    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-black via-slate-950 to-purple-950 flex items-center justify-center px-4 py-8">
+      )}    <div className="min-h-screen relative overflow-hidden bg-linear-to-br from-black via-slate-950 to-purple-950 flex items-center justify-center px-4 py-8">
 
       {/* Floating Cyber Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
@@ -90,7 +90,7 @@ const SignupPage = () => {
         {/* Glow Ring behind logo */}
         <div className="flex justify-center mb-6">
           <div className="relative group cursor-pointer">
-            <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-violet-600 rounded-2xl blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+            <div className="absolute -inset-1 bg-linear-to-r from-pink-500 to-violet-600 rounded-2xl blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
             <div className="relative w-16 h-16 rounded-2xl bg-black text-white border border-white/20 flex items-center justify-center font-black text-2xl">
               <span className="genz-gradient-text">SE</span>
             </div>
@@ -169,9 +169,9 @@ const SignupPage = () => {
           Already got the keys?{" "}
           <Link
             to="/login"
-            className="text-pink-400 font-bold hover:text-pink-300 underline underline-offset-4 decoration-2"
+            className="text-pink-400 font-bold ml-2 hover:text-pink-300 underline underline-offset-4 decoration-2"
           >
-            Sign In here
+            Login
           </Link>
         </p>
 
@@ -180,6 +180,7 @@ const SignupPage = () => {
             POWERED BY ANTIGRAVITY - ⚡
           </p>
         </div>
+
       </div>
     </div>
   </>
