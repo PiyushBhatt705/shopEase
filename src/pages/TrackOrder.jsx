@@ -335,110 +335,113 @@ const TrackOrder = () => {
             </h2>
 
             {/* ROUTE CANVAS / MOCK MAP CONTAINER */}
-            <div className="relative h-64 w-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-inner">
-              
-              {/* Mock Map Background Grids */}
-              <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-              
-              {/* Glow effects for active map */}
-              <div className="absolute -left-20 -top-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
-              <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-green-500/10 rounded-full blur-3xl"></div>
-
-              {/* MAP ROADS (SVG PATHS) */}
-              <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                {/* Main Path */}
-                <path
-                  d="M 60 180 Q 200 80, 320 180 T 580 100 T 800 130"
-                  fill="transparent"
-                  stroke="#334155"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                />
+            {/* ROUTE CANVAS / MOCK MAP CONTAINER */}
+            <div className="relative h-64 w-full bg-slate-900 rounded-2xl overflow-x-auto border border-slate-800 shadow-inner scrollbar-thin">
+              <div className="relative h-full min-w-[820px]">
                 
-                {/* Active path overlay (draws progress) */}
-                <path
-                  d="M 60 180 Q 200 80, 320 180 T 580 100 T 800 130"
-                  fill="transparent"
-                  stroke="#3b82f6"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeDasharray="1000"
-                  strokeDashoffset={
-                    currentStep === 0 ? 1000 :
-                    currentStep === 1 ? 750 :
-                    currentStep === 2 ? 400 : 0
-                  }
-                  className="transition-all duration-1000 ease-out"
-                />
-              </svg>
+                {/* Mock Map Background Grids */}
+                <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+                
+                {/* Glow effects for active map */}
+                <div className="absolute -left-20 -top-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-green-500/10 rounded-full blur-3xl"></div>
 
-              {/* CHECKPOINTS ON THE MAP */}
-              {/* Hub 1: Seller Facility */}
-              <div className="absolute left-[45px] top-[165px] group">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
-                  currentStep >= 0 ? "bg-blue-600 border-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.5)]" : "bg-slate-800 border-slate-700"
-                }`}>
-                  <Home size={14} className="text-white" />
+                {/* MAP ROADS (SVG PATHS) */}
+                <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                  {/* Main Path */}
+                  <path
+                    d="M 60 180 Q 200 80, 320 180 T 580 100 T 800 130"
+                    fill="transparent"
+                    stroke="#334155"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                  />
+                  
+                  {/* Active path overlay (draws progress) */}
+                  <path
+                    d="M 60 180 Q 200 80, 320 180 T 580 100 T 800 130"
+                    fill="transparent"
+                    stroke="#3b82f6"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray="1000"
+                    strokeDashoffset={
+                      currentStep === 0 ? 1000 :
+                      currentStep === 1 ? 750 :
+                      currentStep === 2 ? 400 : 0
+                    }
+                    className="transition-all duration-1000 ease-out"
+                  />
+                </svg>
+
+                {/* CHECKPOINTS ON THE MAP */}
+                {/* Hub 1: Seller Facility */}
+                <div className="absolute left-[45px] top-[165px] group">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
+                    currentStep >= 0 ? "bg-blue-600 border-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.5)]" : "bg-slate-800 border-slate-700"
+                  }`}>
+                    <Home size={14} className="text-white" />
+                  </div>
+                  <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
+                    Seller Store
+                  </div>
                 </div>
-                <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
-                  Seller Store
+
+                {/* Hub 2: Local Sorting Warehouse */}
+                <div className="absolute left-[305px] top-[165px]">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
+                    currentStep >= 1 ? "bg-blue-600 border-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.5)]" : "bg-slate-800 border-slate-700"
+                  }`}>
+                    <Package size={14} className="text-white" />
+                  </div>
+                  <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
+                    Sorting Hub
+                  </div>
                 </div>
+
+                {/* Hub 3: Delhi Courier Point */}
+                <div className="absolute left-[565px] top-[85px]">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
+                    currentStep >= 2 ? "bg-blue-600 border-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.5)]" : "bg-slate-800 border-slate-700"
+                  }`}>
+                    <Truck size={14} className="text-white" />
+                  </div>
+                  <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
+                    Delhi Hub
+                  </div>
+                </div>
+
+                {/* Hub 4: Delivery Location */}
+                <div className="absolute left-[785px] top-[115px]">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
+                    currentStep >= 3 ? "bg-green-600 border-green-300 shadow-[0_0_15px_rgba(34,197,94,0.6)]" : "bg-slate-800 border-slate-700"
+                  }`}>
+                    <MapPin size={14} className="text-white" />
+                  </div>
+                  <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
+                    Home (You)
+                  </div>
+                </div>
+
+                {/* ANIMATED DELIVERY BIKE ICON ON ROUTE */}
+                {currentStep < 3 && (
+                  <div
+                    className="absolute w-10 h-10 bg-blue-500 border border-blue-400 text-white rounded-full flex items-center justify-center bike-icon shadow-[0_0_15px_#3b82f6] transition-all duration-1000 ease-out"
+                    style={{
+                      left: 
+                        currentStep === 0 ? "70px" :
+                        currentStep === 1 ? "340px" :
+                        currentStep === 2 ? "600px" : "800px",
+                      top:
+                        currentStep === 0 ? "130px" :
+                        currentStep === 1 ? "150px" :
+                        currentStep === 2 ? "55px" : "110px"
+                    }}
+                  >
+                    <NavigationIcon size={18} className="rotate-45 text-white animate-pulse" />
+                  </div>
+                )}
               </div>
-
-              {/* Hub 2: Local Sorting Warehouse */}
-              <div className="absolute left-[305px] top-[165px]">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
-                  currentStep >= 1 ? "bg-blue-600 border-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.5)]" : "bg-slate-800 border-slate-700"
-                }`}>
-                  <Package size={14} className="text-white" />
-                </div>
-                <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
-                  Sorting Hub
-                </div>
-              </div>
-
-              {/* Hub 3: Delhi Courier Point */}
-              <div className="absolute left-[565px] top-[85px]">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
-                  currentStep >= 2 ? "bg-blue-600 border-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.5)]" : "bg-slate-800 border-slate-700"
-                }`}>
-                  <Truck size={14} className="text-white" />
-                </div>
-                <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
-                  Delhi Hub
-                </div>
-              </div>
-
-              {/* Hub 4: Delivery Location */}
-              <div className="absolute left-[785px] top-[115px]">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition ${
-                  currentStep >= 3 ? "bg-green-600 border-green-300 shadow-[0_0_15px_rgba(34,197,94,0.6)]" : "bg-slate-800 border-slate-700"
-                }`}>
-                  <MapPin size={14} className="text-white" />
-                </div>
-                <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-white text-[10px] py-1 px-2 rounded-lg whitespace-nowrap opacity-80 pointer-events-none">
-                  Home (You)
-                </div>
-              </div>
-
-              {/* ANIMATED DELIVERY BIKE ICON ON ROUTE */}
-              {currentStep < 3 && (
-                <div
-                  className="absolute w-10 h-10 bg-blue-500 border border-blue-400 text-white rounded-full flex items-center justify-center bike-icon shadow-[0_0_15px_#3b82f6] transition-all duration-1000 ease-out"
-                  style={{
-                    left: 
-                      currentStep === 0 ? "70px" :
-                      currentStep === 1 ? "340px" :
-                      currentStep === 2 ? "600px" : "800px",
-                    top:
-                      currentStep === 0 ? "130px" :
-                      currentStep === 1 ? "150px" :
-                      currentStep === 2 ? "55px" : "110px"
-                  }}
-                >
-                  <NavigationIcon size={18} className="rotate-45 text-white animate-pulse" />
-                </div>
-              )}
             </div>
           </div>
 

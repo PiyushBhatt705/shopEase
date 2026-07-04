@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { MessageSquare, Send, X, Bot, Sparkles, HelpCircle, Ticket, Wallet } from "lucide-react";
 import { apiService } from "../services/apiService";
 import { soundService } from "../services/soundService";
+import { useNavigate } from "react-router-dom";
 
 const Chatbot = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -87,7 +89,7 @@ const Chatbot = () => {
         // Determine search keyword (remove verbs/generic words)
         const stopwords = ["recommend", "show", "find", "product", "products", "buy", "me", "some", "a", "the", "please", "any"];
         const keywords = q.split(" ").filter(w => !stopwords.includes(w) && w.length > 2);
-        
+
         let matches = [];
         if (keywords.length > 0) {
           matches = products.filter(p => {
@@ -103,10 +105,10 @@ const Chatbot = () => {
         }
 
         if (matches.length > 0) {
-          const recList = matches.slice(0, 3).map((p, idx) => 
-            `${idx + 1}. **${p.title.slice(0, 40)}...**\n   Category: *${p.category}* | Price: **$${p.price}**`
-          ).join("\n\n");
-          return `🛍️ **Here are some recommendations I found for you**:\n\n${recList}\n\nSearch on the main catalog or click categories to explore further!`;
+          return {
+            text: `🛍️ **Here are some matching recommendations I found for you**:\n\nClick on any product card below to view its details instantly!`,
+            products: matches.slice(0, 3)
+          };
         }
       } catch (err) {
         console.error("Chatbot product fetch failed:", err);
@@ -132,11 +134,15 @@ const Chatbot = () => {
     setIsTyping(true);
 
     // Get reply
-    const replyText = await parseUserQuery(userText);
+    const reply = await parseUserQuery(userText);
 
     setTimeout(() => {
       setIsTyping(false);
-      setMessages(prev => [...prev, { sender: "bot", text: replyText }]);
+      if (typeof reply === "string") {
+        setMessages(prev => [...prev, { sender: "bot", text: reply }]);
+      } else {
+        setMessages(prev => [...prev, { sender: "bot", text: reply.text, products: reply.products }]);
+      }
       soundService.playPop();
     }, 800);
   };
@@ -161,7 +167,7 @@ const Chatbot = () => {
     <div className="fixed bottom-6 right-6 z-[99] flex flex-col items-end">
       {/* CHAT WINDOW */}
       {isOpen && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-zinc-800 shadow-2xl rounded-3xl w-[330px] sm:w-[360px] h-[450px] flex flex-col mb-4 overflow-hidden animate-scale-in">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-zinc-800 shadow-2xl rounded-3xl w-[calc(100vw-2rem)] sm:w-[360px] max-w-sm chatbot-window h-[450px] max-h-[85vh] flex flex-col mb-4 overflow-hidden animate-scale-in">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 p-4 text-white flex items-center justify-between shadow-md">
             <div className="flex items-center gap-2.5">
@@ -242,6 +248,39 @@ const Chatbot = () => {
                   }`}
                 >
                   {msg.sender === "bot" ? formatText(msg.text) : <p className="text-xs">{msg.text}</p>}
+                  
+                  {msg.products && msg.products.length > 0 && (
+                    <div className="mt-3.5 space-y-2 pt-2.5 border-t border-slate-100 dark:border-slate-800/40">
+                      {msg.products.map((product) => (
+                        <div
+                          key={product.id}
+                          onClick={() => {
+                            soundService.playClick();
+                            setIsOpen(false);
+                            navigate(`/product/${product.id}`);
+                          }}
+                          className="flex items-center gap-2.5 p-2 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-900/60 dark:hover:bg-slate-900 border border-slate-100 dark:border-zinc-800/50 hover:border-indigo-200 rounded-xl cursor-pointer transition duration-200 group"
+                        >
+                          <img
+                            src={product.images?.[0] || product.thumbnail || ""}
+                            alt={product.title}
+                            className="w-10 h-10 object-contain rounded-lg bg-white p-0.5"
+                          />
+                          <div className="flex-grow min-w-0 text-left">
+                            <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-250 truncate group-hover:text-indigo-650 dark:group-hover:text-indigo-400">
+                              {product.title}
+                            </h4>
+                            <span className="text-[10px] font-black text-slate-900 dark:text-white mt-0.5 block">
+                              ${parseFloat(product.price).toFixed(2)}
+                            </span>
+                          </div>
+                          <span className="text-[9px] bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-bold uppercase shrink-0">
+                            View →
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

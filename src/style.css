@@ -895,3 +895,63 @@ body.gold-theme-active .glass-raindrops {
   transform: scaleX(1);
   transform-origin: bottom left;
 }
+
+/* 📱 SCREEN RESPONSIVENESS AND MOBILE BURST PREVENTION UTILITIES */
+@media (max-width: 640px) {
+  /* Scale down massive font sizes on mobile devices to prevent text overflow */
+  h1 {
+    font-size: 1.875rem !important; /* text-3xl */
+    line-height: 2.25rem !important;
+  }
+  h2 {
+    font-size: 1.5rem !important; /* text-2xl */
+    line-height: 2rem !important;
+  }
+  h3 {
+    font-size: 1.25rem !important; /* text-xl */
+    line-height: 1.75rem !important;
+  }
+
+  /* Scale down extreme margins and padding on card layers to keep them inside screen bounds */
+  .p-6, .p-8, .p-10, .p-12 {
+    padding: 1rem !important;
+  }
+  .px-6, .px-8, .px-10, .px-12 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .py-6, .py-8, .py-10, .py-12 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  /* Adjust placement of the chatbot action triggers on mobile screen bottom-edges */
+  .chatbot-trigger-btn {
+    width: 3.25rem !important;
+    height: 3.25rem !important;
+    bottom: 0.75rem !important;
+    right: 0.75rem !important;
+  }
+  .fixed.bottom-6.right-6 {
+    bottom: 1rem !important;
+    right: 1rem !important;
+  }
+
+  /* Force scroll-wrapping for table views to prevent horizontal bursting */
+  .table-scroll-container,
+  div:has(> table) {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ultra-small screen layout overrides for floating chat panel */
+  .chatbot-window {
+    width: calc(100vw - 1.5rem) !important;
+    right: 0.75rem !important;
+    bottom: 4.5rem !important;
+    height: 400px !important;
+  }
+}
