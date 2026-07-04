@@ -230,9 +230,10 @@ const ProductDetails = () => {
              className="flex-1 cursor-pointer bg-gray-100 border border-gray-200 text-gray-800 py-3.5 rounded-xl hover:bg-blue-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-300 flex items-center justify-center gap-2 font-bold scale-hover shadow-sm"
              onClick={(e) => {
               e.stopPropagation()
-              addToCart(product)
-              setToast("Added to cart 🛒")
-              setTimeout(() => setToast(null),3000)
+              if (addToCart(product)) {
+                setToast("Added to cart 🛒")
+                setTimeout(() => setToast(null),3000)
+              }
              }}
              >
               <ShoppingBag size={18} />

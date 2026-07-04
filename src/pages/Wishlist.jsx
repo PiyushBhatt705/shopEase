@@ -31,9 +31,10 @@ const Wishlist = () => {
   };
 
   const handleAddToCart = (product) => {
-    addToCart(product);
-    setToast("Added to cart 🛒");
-    setTimeout(() => setToast(""), 2000);
+    if (addToCart(product)) {
+      setToast("Added to cart 🛒");
+      setTimeout(() => setToast(""), 2000);
+    }
   };
 
   if (loading) {

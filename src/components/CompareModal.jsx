@@ -21,10 +21,11 @@ const CompareModal = () => {
 
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
-    addToCart(product);
-    soundService.playAddCart();
-    setCompareToast("Added to cart from comparison! 🛒");
-    setTimeout(() => setCompareToast(""), 2000);
+    if (addToCart(product)) {
+      soundService.playAddCart();
+      setCompareToast("Added to cart from comparison! 🛒");
+      setTimeout(() => setCompareToast(""), 2000);
+    }
   };
 
   const handleBuyNow = (e, product) => {

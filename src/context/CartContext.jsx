@@ -17,6 +17,12 @@ const CartProvider = ({ children }) => {
 
   // 🛒 ADD TO CART
   const addToCart = (product) => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (!isLoggedIn) {
+      window.location.href = "/login";
+      return false;
+    }
+
     setCart((prevCart) => {
       const existingItem = prevCart.find(
         (item) => item.id === product.id
@@ -32,6 +38,7 @@ const CartProvider = ({ children }) => {
 
       return [...prevCart, { ...product, quantity: 1 }];
     });
+    return true;
   };
 
   // ❌ REMOVE SINGLE ITEM

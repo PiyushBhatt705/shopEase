@@ -210,9 +210,10 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  addToCart(product);
-                  soundService.playAddCart();
-                  setToast("Added to cart 🛒");
+                  if (addToCart(product)) {
+                    soundService.playAddCart();
+                    setToast("Added to cart 🛒");
+                  }
                 }}
                 className="w-full mt-4 product-card-btn py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer scale-hover"
               >
