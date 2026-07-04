@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Bell, Lock, Shield, Eye, Trash2, HelpCircle, Save, Check, RefreshCw, Volume2, Sparkles, Smartphone } from "lucide-react";
 import Toast from "../components/Toast";
+import { soundService } from "../services/soundService";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -38,8 +39,22 @@ const Settings = () => {
   });
 
   // Gen-Z styling options
-  const [soundEffects, setSoundEffects] = useState(true);
+  const [soundEffects, setSoundEffects] = useState(() => localStorage.getItem("soundEffects") !== "false");
   const [accentColor, setAccentColor] = useState(localStorage.getItem("accentColor") || "cyan");
+
+  const handleSoundToggle = () => {
+    const nextVal = !soundEffects;
+    setSoundEffects(nextVal);
+    localStorage.setItem("soundEffects", nextVal ? "true" : "false");
+    // Play sound immediately to confirm toggle
+    if (nextVal) {
+      soundService.playSuccess();
+    } else {
+      soundService.playTrash();
+    }
+    setToast(`Interactive sounds ${nextVal ? "enabled 🔊" : "disabled 🔇"}!`);
+    setTimeout(() => setToast(""), 1500);
+  };
 
   useEffect(() => {
     // Apply accent class to body if needed
@@ -193,7 +208,7 @@ const Settings = () => {
                 <input 
                   type="checkbox" 
                   checked={soundEffects} 
-                  onChange={() => setSoundEffects(!soundEffects)}
+                  onChange={handleSoundToggle}
                   className="sr-only settings-toggle-checkbox" 
                 />
                 <div className="w-9 h-5 bg-slate-200 rounded-full dark:bg-slate-850 transition duration-350 settings-toggle-label">

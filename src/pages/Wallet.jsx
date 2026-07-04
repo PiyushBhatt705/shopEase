@@ -275,10 +275,15 @@ const Wallet = () => {
         Back
       </button>
 
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-8 flex items-center gap-3">
-        <WalletIcon className="text-blue-600" size={32} />
-        My Secure Wallet
-      </h1>
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8 animate-scale-in-dash">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
+            <span className="genz-gradient-text genz-text-glow">Your Wallet Balance 💸</span>
+          </h1>
+          <p className="text-sm text-slate-400 font-semibold mt-1">Manage your digital funds, top-up balance, and track payment transactions. Fast Cash.</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         

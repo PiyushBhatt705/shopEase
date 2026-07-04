@@ -107,10 +107,10 @@ const Navbar = () => {
 
 
   return (
-    <div className="bg-white">
+    <div className="sticky top-0 z-[49] w-full bg-white/75 dark:bg-slate-950/75 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-850/40 px-2 py-3 md:px-4 md:py-3.5 shopease-nav-wrapper">
       {latestToast && <Toast message={latestToast} onClose={() => setLatestToast(null)} />}
       {/* Main Navbar */}
-      <nav className="bg-white shadow-sm px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2 md:gap-0">
+      <nav className="navbar-3d glass-raindrops px-4 md:px-6 py-2.5 flex items-center justify-between gap-2 md:gap-0 rounded-3xl border border-white/20 dark:border-slate-800/80 shadow-2xl relative">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-1 md:space-x-2 flex-shrink-0 cursor-pointer">
           <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Shop</span>
@@ -332,7 +332,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-200 shadow-md">
+        <div className="lg:hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl rounded-2xl p-4 mt-2 max-w-7xl mx-auto animate-scale-in text-gray-800">
           <div className="px-4 py-4 space-y-3">
             {/* Mobile Navigation Links */}
             <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-500 font-medium text-sm py-2 cursor-pointer">Home</Link>

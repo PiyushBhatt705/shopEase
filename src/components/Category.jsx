@@ -26,24 +26,23 @@ const Category = () => {
   return (
     <section className="max-w-7xl mx-auto px-4 py-12">
       {/* Heading */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8 animate-slide-left" style={{ animationFillMode: 'both' }}>
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">
-            Shop by Category
+          <h2 className="text-3xl font-black tracking-tight">
+            <span className="genz-gradient-text genz-text-glow">Shop by Department 🎒</span>
           </h2>
-          <p className="text-gray-500 mt-2">
-            Explore products by category
-          </p>
+          <p className="text-sm text-slate-400 font-semibold mt-1.5 font-sans">Explore our diverse curated list of products by category. Aesthetic Vibez.</p>
         </div>
       </div>
 
       {/* Categories Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        {categories.map((category) => (
+        {categories.map((category, idx) => (
           <div
             key={category.id}
             onClick={() => navigate(`/category/${category.id}`)}
-            className="animated-border-card group cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500"
+            className="animated-border-card category-card-premium group cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500 animate-slide-up-dash"
+            style={{ animationDelay: `${idx * 80}ms`, animationFillMode: 'both' }}
           >
             <div className="animated-border-card-inner overflow-hidden rounded-3xl h-full flex flex-col">
               {/* Image */}

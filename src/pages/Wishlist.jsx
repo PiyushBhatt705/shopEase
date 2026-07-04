@@ -58,14 +58,19 @@ const Wishlist = () => {
         Back to Home
       </button>
 
-      <div className="flex items-center gap-3 mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">My Wishlist</h1>
-        {wishlist.length > 0 && (
-          <span className="bg-red-50 border border-red-150 text-red-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
-            <Heart size={12} fill="red" className="text-red-500" />
-            {wishlist.length} Items
-          </span>
-        )}
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8 animate-scale-in-dash">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
+            <span className="genz-gradient-text genz-text-glow">Your Liked Products ❤️</span>
+            {wishlist.length > 0 && (
+              <span className="bg-red-50 border border-red-150 text-red-700 dark:bg-red-950/20 dark:text-red-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 h-7">
+                {wishlist.length} Items
+              </span>
+            )}
+          </h1>
+          <p className="text-sm text-slate-400 font-semibold mt-1">Keep track of your favorite items, checkout whenever you want. Pure Love.</p>
+        </div>
       </div>
 
       {wishlist.length === 0 ? (

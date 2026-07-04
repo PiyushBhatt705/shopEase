@@ -273,7 +273,7 @@ const AccountDashboard = () => {
                   <ShoppingBag size={20} />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200">Track & Manage Orders</h4>
+                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200 link-underline">Track & Manage Orders</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">Check order shipment in transit.</p>
                 </div>
               </div>
@@ -291,7 +291,7 @@ const AccountDashboard = () => {
                   <Heart size={20} />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200">Saved Wishlist</h4>
+                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200 link-underline">Saved Wishlist</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">Your curated shopping aesthetic.</p>
                 </div>
               </div>
@@ -309,7 +309,7 @@ const AccountDashboard = () => {
                   <NavigationIcon size={20} />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200">Radar & Addresses</h4>
+                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200 link-underline">Radar & Addresses</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">Edit delivery location using Map picker.</p>
                 </div>
               </div>
@@ -327,7 +327,7 @@ const AccountDashboard = () => {
                   <Key size={20} />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200">Security & Preferences</h4>
+                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200 link-underline">Security & Preferences</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">Toggle 2FA alerts, sessions and sounds.</p>
                 </div>
               </div>
@@ -345,7 +345,7 @@ const AccountDashboard = () => {
                   <ShieldCheck size={20} />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200">
+                  <h4 className="font-extrabold text-sm text-slate-850 dark:text-slate-200 link-underline">
                     {isSeller ? "Manage Your Products" : "Become a Seller"}
                   </h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">

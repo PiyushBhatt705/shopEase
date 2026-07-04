@@ -83,7 +83,7 @@ const Home = () => {
       <HeroSlider />
 
       {/* PREMIUM INTERACTIVE COUPON BANNER */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 animate-scale-in-dash" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
         <div 
           onClick={() => setShowPromoModal(true)}
           className="cursor-pointer bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-6 hover:shadow-2xl transition duration-300 transform scale-hover border-2 border-indigo-400/25 relative overflow-hidden group"
@@ -97,7 +97,7 @@ const Home = () => {
               <Gift size={28} className="text-yellow-300 animate-bounce" />
             </div>
             <div>
-              <h3 className="text-xl md:text-2xl font-black font-sans tracking-tight">Unlock Premium Coupon Discounts!</h3>
+              <h3 className="text-xl md:text-2xl font-black font-sans tracking-tight animate-slide-left" style={{ animationDelay: '250ms', animationFillMode: 'both' }}>Unlock Premium Coupon Discounts!</h3>
               <p className="text-indigo-100 text-sm mt-1 font-medium leading-relaxed">
                 Click to explore exclusive promo codes. Copy instantly and apply them at checkout to save big!
               </p>
@@ -121,9 +121,14 @@ const Home = () => {
 
       {/* featured products section */}
       <div className="w-full py-8 md:py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-end mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Featured Products</h2>
-          <Button text={'View All'} handleClick={() => navigate('/products')}/>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8 animate-scale-in-dash" style={{ animationDelay: '150ms', animationFillMode: 'both' }}>
+          <div>
+            <h2 className="text-3xl font-black tracking-tight">
+              <span className="genz-gradient-text genz-text-glow">Featured Hot Products 🔥</span>
+            </h2>
+            <p className="text-sm text-slate-400 font-semibold mt-1.5">Discover our highest-rated and trending collections chosen just for you. Real Deal.</p>
+          </div>
+          <Button text={'View All Products →'} handleClick={() => navigate('/products')}/>
         </div>
         <ProductCard products={products.slice(0, 12)}/>
       </div>

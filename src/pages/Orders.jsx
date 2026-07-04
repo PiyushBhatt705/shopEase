@@ -67,10 +67,12 @@ const Orders = () => {
         Back to Home
       </button>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8 animate-scale-in-dash">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Order Center</h1>
-          <p className="text-sm text-gray-500 mt-1">Track active deliveries and view shipment history.</p>
+          <h1 className="text-4xl font-black tracking-tight">
+            <span className="genz-gradient-text genz-text-glow">Your Order Center 📦</span>
+          </h1>
+          <p className="text-sm text-slate-400 font-semibold mt-1">Track active deliveries, monitor status, and view shipment history. Safe Transit.</p>
         </div>
         <button
           onClick={() => navigate("/delivered-orders")}

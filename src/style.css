@@ -615,3 +615,283 @@ body.gold-theme-active .animated-border-card-inner {
 .animate-scale-in-dash {
   animation: scaleInDash 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ⚖️ BOTTOM COMPARISON DRAWER & 🤖 AI ASSISTANT LAYOUTS */
+@keyframes slideUpCompare {
+  0% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-up {
+  animation: slideUpCompare 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleInPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.animate-scale-in {
+  animation: scaleInPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes fadeInShort {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeInShort 0.2s ease-out forwards;
+}
+
+@keyframes triggerPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4), 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(79, 70, 229, 0), 0 15px 30px -5px rgba(0, 0, 0, 0.2);
+  }
+}
+.chatbot-trigger-btn {
+  animation: triggerPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 👑 HEADING ENTRANCE & GLOW ANIMATIONS */
+@keyframes slideLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-35px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-slide-left {
+  animation: slideLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.animate-pop-reveal {
+  animation: popReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Category Card Zoom Lift */
+.category-card-premium {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.category-card-premium:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 20px 35px -5px rgba(59, 130, 246, 0.15), 
+              0 10px 15px -5px rgba(139, 92, 246, 0.1);
+}
+
+/* 🌀 GLOBAL SITENAV & PAGE HEADINGS MOTION SYSTEM */
+main h1 {
+  animation: slideLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 50ms;
+}
+
+main h2:not(.product-card h3):not(th h2):not(.compare-modal h2) {
+  animation: popReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: 120ms;
+}
+
+/* Add custom slide-up fade for intermediate headings */
+@keyframes slideUpShort {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-up-short {
+  animation: slideUpShort 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Apply entry animations to general settings and layout subtitles */
+main h3:not(.product-card h3):not(.compare-modal h3) {
+  animation: slideUpShort 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 180ms;
+}
+
+/* 🔍 SEARCH BAR, ICON & PLACEHOLDER PREMIUM OVERRIDES */
+.group input[placeholder*="Search"],
+input[placeholder*="Search"] {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #1f2937 !important;
+  backdrop-filter: blur(4px);
+  transition: all 0.30s ease;
+}
+
+input[placeholder*="Search"]::placeholder {
+  color: rgba(0, 0, 0, 0.4) !important;
+  opacity: 1 !important;
+  font-weight: 600;
+}
+
+input[placeholder*="Search"]:focus {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+svg.text-gray-400 {
+  color: rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.25s ease;
+}
+
+.group:focus-within svg.text-gray-400,
+div:focus-within > svg.text-gray-400 {
+  color: #3b82f6 !important;
+}
+
+/* --- MIDNIGHT DARK THEME OVERRIDES --- */
+body.dark-theme-active input[placeholder*="Search"] {
+  background-color: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f9fafb !important;
+}
+body.dark-theme-active input[placeholder*="Search"]::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+body.dark-theme-active input[placeholder*="Search"]:focus {
+  background-color: rgba(17, 24, 39, 0.95) !important;
+  border-color: #3b82f6 !important;
+}
+body.dark-theme-active svg.text-gray-400 {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+body.dark-theme-active .group:focus-within svg.text-gray-400,
+body.dark-theme-active div:focus-within > svg.text-gray-400 {
+  color: #3b82f6 !important;
+}
+
+/* --- IMPERIAL GOLD THEME OVERRIDES --- */
+body.gold-theme-active input[placeholder*="Search"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(234, 179, 8, 0.2) !important;
+  color: #f4f4f5 !important;
+}
+body.gold-theme-active input[placeholder*="Search"]::placeholder {
+  color: rgba(234, 179, 8, 0.4) !important;
+}
+body.gold-theme-active input[placeholder*="Search"]:focus {
+  background-color: rgba(9, 9, 11, 0.95) !important;
+  border-color: #eab308 !important;
+}
+body.gold-theme-active svg.text-gray-400 {
+  color: rgba(234, 179, 8, 0.4) !important;
+}
+body.gold-theme-active .group:focus-within svg.text-gray-400,
+body.gold-theme-active div:focus-within > svg.text-gray-400 {
+  color: #eab308 !important;
+}
+
+/* 🌊 FLOATING GLASS RAINDROPS 3D NAVBAR Styles */
+.navbar-3d {
+  box-shadow: 0 15px 35px -12px rgba(0, 0, 0, 0.12), 
+              0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+              0 8px 16px -8px rgba(0, 0, 0, 0.04) !important;
+  transform: perspective(1000px) rotateX(0.4deg);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.navbar-3d:hover {
+  transform: perspective(1000px) rotateX(0deg) translateY(-2px);
+  box-shadow: 0 25px 45px -12px rgba(59, 130, 246, 0.18), 
+              0 0 0 1.5px rgba(255, 255, 255, 0.7) inset,
+              0 10px 20px -8px rgba(59, 130, 246, 0.1) !important;
+}
+
+.glass-raindrops {
+  background-image: 
+    radial-gradient(circle at 12% 25%, rgba(255, 255, 255, 0.5) 1px, transparent 1.2px),
+    radial-gradient(circle at 78% 35%, rgba(255, 255, 255, 0.5) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 45% 80%, rgba(255, 255, 255, 0.45) 1.2px, transparent 1.2px),
+    radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.6) 1px, transparent 1.2px),
+    radial-gradient(circle at 15% 70%, rgba(255, 255, 255, 0.5) 1.4px, transparent 1.4px),
+    radial-gradient(circle at 38% 55%, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+  background-size: 70px 70px;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+}
+
+/* Dark mode modifications */
+body.dark-theme-active .navbar-3d {
+  background-color: rgba(17, 24, 39, 0.45) !important;
+  box-shadow: 0 15px 35px -12px rgba(0, 0, 0, 0.45), 
+              0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+}
+
+body.dark-theme-active .navbar-3d:hover {
+  box-shadow: 0 25px 45px -12px rgba(59, 130, 246, 0.28), 
+              0 0 0 1.5px rgba(255, 255, 255, 0.12) inset !important;
+}
+
+body.dark-theme-active .glass-raindrops {
+  background-image: 
+    radial-gradient(circle at 12% 25%, rgba(255, 255, 255, 0.08) 1px, transparent 1.2px),
+    radial-gradient(circle at 78% 35%, rgba(255, 255, 255, 0.07) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 45% 80%, rgba(255, 255, 255, 0.06) 1.2px, transparent 1.2px),
+    radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.09) 1px, transparent 1.2px),
+    radial-gradient(circle at 15% 70%, rgba(255, 255, 255, 0.07) 1.4px, transparent 1.4px),
+    radial-gradient(circle at 38% 55%, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+}
+
+/* Gold mode modifications */
+body.gold-theme-active .navbar-3d {
+  background-color: rgba(9, 9, 11, 0.45) !important;
+  box-shadow: 0 15px 35px -12px rgba(0, 0, 0, 0.55), 
+              0 0 0 1px rgba(234, 179, 8, 0.08) inset !important;
+}
+
+body.gold-theme-active .navbar-3d:hover {
+  box-shadow: 0 25px 45px -12px rgba(234, 179, 8, 0.2), 
+              0 0 0 1.5px rgba(234, 179, 8, 0.15) inset !important;
+}
+
+body.gold-theme-active .glass-raindrops {
+  background-image: 
+    radial-gradient(circle at 12% 25%, rgba(234, 179, 8, 0.08) 1px, transparent 1.2px),
+    radial-gradient(circle at 78% 35%, rgba(234, 179, 8, 0.07) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 45% 80%, rgba(234, 179, 8, 0.06) 1.2px, transparent 1.2px),
+    radial-gradient(circle at 88% 18%, rgba(234, 179, 8, 0.09) 1px, transparent 1.2px);
+}
+
+/* Link underline trigger inside group card in Account Page */
+.group:hover .link-underline::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}

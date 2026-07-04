@@ -1,15 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
-import { Heart, AlertTriangle } from "lucide-react";
+import { Heart, AlertTriangle, Scale } from "lucide-react";
 import Toast from "../components/Toast";
+import { useCompare } from "../hooks/useCompare";
+import { soundService } from "../services/soundService";
 
 const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { compareList, addToCompare, removeFromCompare } = useCompare();
   const [toast, setToast] = useState(null);
   const [wishlist, setWishlist] = useState([]);
   const [imageIndices, setImageIndices] = useState({});
+
+  const isCompared = (id) => compareList.some((item) => item.id === id);
+
+  const handleCompareToggle = (product) => {
+    if (isCompared(product.id)) {
+      removeFromCompare(product.id);
+    } else {
+      addToCompare(product);
+    }
+  };
 
   const handleNextImage = (e, productId, totalImages) => {
     e.stopPropagation();
@@ -38,6 +51,7 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
 
   const toggleWishlist = (product) => {
     let updated;
+    soundService.playPop();
     if (isWishlisted(product.id)) {
       updated = wishlist.filter((item) => item.id !== product.id);
       setToast("Removed from wishlist 💔");
@@ -106,6 +120,22 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
                 className="absolute top-3 right-3 p-2 bg-white/95 rounded-full border border-gray-150 shadow-xs hover:text-red-500 transition scale-hover cursor-pointer z-10 hover:scale-110 flex items-center justify-center"
               >
                 <Heart size={16} fill={isWishlisted(product.id) ? "red" : "none"} className={isWishlisted(product.id) ? "text-red-500" : "text-gray-500"} />
+              </button>
+
+              {/* Compare Toggle */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCompareToggle(product);
+                }}
+                className={`absolute top-12 right-3 p-2 rounded-full border transition scale-hover cursor-pointer z-10 hover:scale-110 flex items-center justify-center ${
+                  isCompared(product.id)
+                    ? "bg-indigo-650 text-white border-indigo-700 shadow-sm"
+                    : "bg-white/95 text-gray-500 border-gray-150 hover:text-indigo-650 hover:bg-white"
+                }`}
+                title="Compare spec sheet"
+              >
+                <Scale size={15} />
               </button>
 
               <div className="relative w-full h-full flex justify-center items-center group/img">
@@ -181,6 +211,7 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
                 onClick={(e) => {
                   e.stopPropagation();
                   addToCart(product);
+                  soundService.playAddCart();
                   setToast("Added to cart 🛒");
                 }}
                 className="w-full mt-4 product-card-btn py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer scale-hover"

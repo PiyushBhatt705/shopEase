@@ -52,7 +52,14 @@ const Cart = () => {
       `}</style>
 
       {/* HEADER */}
-      <h1 className="text-3xl font-bold mb-6">Shopping Cart </h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8 animate-scale-in-dash">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight">
+            <span className="genz-gradient-text genz-text-glow">Your Shopping Cart 🛒</span>
+          </h1>
+          <p className="text-sm text-slate-400 font-semibold mt-1">Review your selections, adjust quantities, and head to checkout. Secure Deal.</p>
+        </div>
+      </div>
 
       {/* CART ITEMS */}
       <div className="space-y-5">

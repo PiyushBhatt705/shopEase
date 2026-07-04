@@ -139,16 +139,16 @@ const AllProducts = () => {
     <div className="max-w-7xl mx-auto px-4 py-10">
       
       {/* Heading */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 border-b pb-6 border-gray-100">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-10 animate-scale-in-dash">
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-            {pageTitle}
+          <h1 className="text-4xl font-black tracking-tight">
+            <span className="genz-gradient-text genz-text-glow">{pageTitle} Catalog 🛍️</span>
           </h1>
-          <p className="text-gray-500 mt-2 font-medium">
-            Showing {filteredProducts.length} of {finalProducts.length} products
+          <p className="text-sm text-slate-400 font-semibold mt-1.5">
+            Explore our curated items catalog. Showing {filteredProducts.length} of {finalProducts.length} products. Keep scrolling.
           </p>
         </div>
-        <Button text={"<- Back to Home"} handleClick={() => navigate("/")} />
+        <Button text={"← Back to Home"} handleClick={() => navigate("/")} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

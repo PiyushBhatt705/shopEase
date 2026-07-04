@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import Toast from "../components/Toast";
 import { apiService } from "../services/apiService";
+import { soundService } from "../services/soundService";
+import Confetti from "../components/Confetti";
 
 const Checkout = () => {
   const location = useLocation();
@@ -78,6 +80,7 @@ const Checkout = () => {
   const [couponStatus, setCouponStatus] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState("");
   const [isLocatingAtCheckout, setIsLocatingAtCheckout] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const handleUseLocationAtCheckout = () => {
     if (!navigator.geolocation) {
@@ -268,12 +271,14 @@ const Checkout = () => {
   const handlePlaceOrder = (e) => {
     e.preventDefault();
     if (!validateForm()) {
+      soundService.playError();
       setToast("Please fill in all details correctly ⚠️");
       setTimeout(() => setToast(""), 3000);
       return;
     }
 
     if (paymentMethod === "wallet" && walletBalance < grandTotal) {
+      soundService.playError();
       setToast("Insufficient wallet balance for this purchase ⚠️");
       setTimeout(() => setToast(""), 3000);
       return;
@@ -321,6 +326,8 @@ const Checkout = () => {
             }
 
             setGatewayStep("success");
+            setShowConfetti(true);
+            soundService.playSuccess();
             window.dispatchEvent(new Event("walletUpdate"));
             if (!buyNowProduct) {
               clearCart();
@@ -328,6 +335,8 @@ const Checkout = () => {
           } catch (err) {
             console.error("Checkout COD/Wallet error:", err);
             setGatewayStep("success");
+            setShowConfetti(true);
+            soundService.playSuccess();
           }
         }, 1500);
       } else {
@@ -340,6 +349,7 @@ const Checkout = () => {
   const handleOtpSubmit = (e) => {
     e.preventDefault();
     if (enteredOtp !== "123456") {
+      soundService.playError();
       setOtpError("Invalid OTP. For testing, enter 123456.");
       return;
     }
@@ -376,6 +386,8 @@ const Checkout = () => {
           }
 
           setGatewayStep("success");
+          setShowConfetti(true);
+          soundService.playSuccess();
           window.dispatchEvent(new Event("walletUpdate"));
           if (!buyNowProduct) {
             clearCart();
@@ -399,6 +411,7 @@ const Checkout = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
+      {showConfetti && <Confetti duration={6000} />}
       {toast && <Toast message={toast} onClose={() => setToast("")} />}
 
       <style>{`

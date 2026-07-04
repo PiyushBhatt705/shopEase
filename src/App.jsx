@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { soundService } from './services/soundService'
+import CompareDrawer from './components/CompareDrawer'
+import CompareModal from './components/CompareModal'
+import Chatbot from './components/Chatbot'
 
 import Home from './pages/Home'
 import ProductDetails from './pages/ProductDetails'
@@ -35,6 +39,8 @@ function App() {
     } else if (savedTheme === "gold") {
       body.classList.add("gold-theme-active");
     }
+    // Ask for system desktop notification permissions
+    soundService.requestNotificationPermission();
   }, []);
 
   // ── Keep-Alive Ping (prevents Render backend from sleeping) ───────────────
@@ -101,6 +107,10 @@ function App() {
                 };
 
                 setDeliveryToast(mappedOrder);
+                soundService.showNativeNotification(
+                  "Order Delivered! 🎉", 
+                  `Your order ${deliveredOrder.orderId.slice(0, 12)} has been successfully delivered!`
+                );
                 window.dispatchEvent(new Event("ordersChanged"));
                 window.dispatchEvent(new Event("activeOrderChanged"));
 
@@ -232,6 +242,13 @@ function App() {
 
         {/* FOOTER */}
         <Footer />
+
+        {/* COMPARISON DRAWER & DETAILS MODAL */}
+        <CompareDrawer />
+        <CompareModal />
+
+        {/* FLOATING AI ASSISTANT CHATBOT */}
+        <Chatbot />
 
         {/* Global Delivery Notification Banner */}
         {deliveryToast && (
