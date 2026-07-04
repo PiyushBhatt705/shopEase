@@ -112,9 +112,25 @@ const Navbar = () => {
       {/* Main Navbar */}
       <nav className="navbar-3d glass-raindrops px-4 md:px-6 py-2.5 flex items-center justify-between gap-2 md:gap-0 rounded-3xl border border-white/20 dark:border-slate-800/80 shadow-2xl relative">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-1 md:space-x-2 flex-shrink-0 cursor-pointer">
-          <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Shop</span>
-          <span className="text-lg sm:text-xl md:text-2xl font-bold text-blue-500">Ease</span>
+        <Link to="/" className="flex items-center space-x-2 flex-shrink-0 cursor-pointer group">
+          <svg className="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-sm group-hover:scale-105 group-hover:rotate-3 transition duration-300" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="16" width="480" height="480" rx="140" fill="url(#navBgGrad)" />
+            <path d="M192 190 V140 C192 104.6 220.6 76 256 76 C291.4 76 320 104.6 320 140 V190" fill="none" stroke="url(#navGoldGrad)" strokeWidth="24" strokeLinecap="round" />
+            <path d="M128 190 H384 L360 410 H152 Z" fill="url(#navBlueGrad)" />
+            <path d="M128 190 H384" stroke="url(#navGoldGrad)" strokeWidth="12" />
+            <path d="M236 250 C210 250 210 280 236 290 C262 300 262 330 236 330 C210 330 210 310 210 310" fill="none" stroke="url(#navGoldGrad)" strokeWidth="20" strokeLinecap="round" />
+            <path d="M302 250 H270 V330 H302 M270 290 H296" fill="none" stroke="#f8fafc" strokeWidth="20" strokeLinecap="round" />
+            <path d="M360 140 L366 155 L381 155 L369 165 L373 180 L360 170 L347 180 L351 165 L339 155 L354 155 Z" fill="url(#navGoldGrad)" />
+            <defs>
+              <linearGradient id="navBgGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#0f172a" /><stop offset="100%" stopColor="#1e1b4b" /></linearGradient>
+              <linearGradient id="navGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fbbf24" /><stop offset="100%" stopColor="#d97706" /></linearGradient>
+              <linearGradient id="navBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#38bdf8" /><stop offset="100%" stopColor="#2563eb" /></linearGradient>
+            </defs>
+          </svg>
+          <div className="flex items-center">
+            <span className="text-lg sm:text-xl md:text-2xl font-black text-slate-800 dark:text-white tracking-tight">Shop</span>
+            <span className="text-lg sm:text-xl md:text-2xl font-black text-blue-500 tracking-tight">Ease</span>
+          </div>
         </Link>
 
         {/* Middle Navigation - Hidden on Mobile */}
