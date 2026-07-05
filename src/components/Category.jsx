@@ -1,6 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const getCategoryFallbackImage = (name) => {
+  const lowercaseName = (name || "").toLowerCase();
+  if (lowercaseName.includes("cloth") || lowercaseName.includes("wear") || lowercaseName.includes("fashion")) {
+    return "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800";
+  }
+  if (lowercaseName.includes("electr") || lowercaseName.includes("tech") || lowercaseName.includes("gadget")) {
+    return "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=800";
+  }
+  if (lowercaseName.includes("furnit") || lowercaseName.includes("home") || lowercaseName.includes("decor")) {
+    return "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800";
+  }
+  if (lowercaseName.includes("shoe") || lowercaseName.includes("sneaker") || lowercaseName.includes("footwear")) {
+    return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800";
+  }
+  if (lowercaseName.includes("bag") || lowercaseName.includes("backpack") || lowercaseName.includes("accessory")) {
+    return "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800";
+  }
+  return "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800";
+};
+
 const Category = () => {
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
@@ -16,7 +36,17 @@ const Category = () => {
               category.image &&
               category.image.startsWith("http")
           )
-          .slice(0, 5);
+          .slice(0, 5)
+          .map((category) => {
+            let image = category.image;
+            if (image.includes("escuelajs.co") || image.includes("placeimg.com")) {
+              image = getCategoryFallbackImage(category.name);
+            }
+            return {
+              ...category,
+              image
+            };
+          });
 
         setCategories(filteredCategories);
       })

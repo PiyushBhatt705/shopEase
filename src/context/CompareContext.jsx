@@ -1,19 +1,19 @@
 import React, { createContext, useState, useEffect } from "react";
 import { soundService } from "../services/soundService";
+import { safeLocalStorage } from "../utils/safeStorage";
 
 export const CompareContext = createContext();
 
 const CompareProvider = ({ children }) => {
   const [compareList, setCompareList] = useState(() => {
-    const saved = localStorage.getItem("compareList");
-    return saved ? JSON.parse(saved) : [];
+    return safeLocalStorage.getItem("compareList", []);
   });
   
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [compareToast, setCompareToast] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("compareList", JSON.stringify(compareList));
+    safeLocalStorage.setItem("compareList", compareList);
   }, [compareList]);
 
   const addToCompare = (product) => {

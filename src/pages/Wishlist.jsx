@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
 import { Heart, ShoppingCart, Trash2, ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import Toast from "../components/Toast";
+import { safeLocalStorage } from "../utils/safeStorage";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -13,17 +14,15 @@ const Wishlist = () => {
 
   // Load wishlist from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("wishlist");
-    if (saved) {
-      setWishlist(JSON.parse(saved));
-    }
+    const saved = safeLocalStorage.getItem("wishlist", []);
+    setWishlist(saved);
     setLoading(false);
   }, []);
 
   const removeFromWishlist = (id) => {
     const updated = wishlist.filter((item) => item.id !== id);
     setWishlist(updated);
-    localStorage.setItem("wishlist", JSON.stringify(updated));
+    safeLocalStorage.setItem("wishlist", updated);
     // Trigger custom event so navbar can update instantly
     window.dispatchEvent(new Event("wishlistUpdate"));
     setToast("Removed from wishlist 💔");

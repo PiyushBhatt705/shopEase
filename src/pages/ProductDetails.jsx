@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import Toast from '../components/Toast'
 import {useCart} from '../hooks/useCart'
 import { apiService } from '../services/apiService'
+import { safeLocalStorage } from '../utils/safeStorage'
 
 const ProductDetails = () => {
   const { id } = useParams()
@@ -21,10 +22,8 @@ const ProductDetails = () => {
 
   // Wishlist logic
   useEffect(() => {
-    const saved = localStorage.getItem("wishlist");
-    if (saved) {
-      setWishlist(JSON.parse(saved));
-    }
+    const saved = safeLocalStorage.getItem("wishlist", []);
+    setWishlist(saved);
   }, []);
 
   const isWishlisted = (id) => wishlist.some((item) => item.id === id);
@@ -39,7 +38,7 @@ const ProductDetails = () => {
       setToast("Added to wishlist ❤️");
     }
     setWishlist(updated);
-    localStorage.setItem("wishlist", JSON.stringify(updated));
+    safeLocalStorage.setItem("wishlist", updated);
     window.dispatchEvent(new Event("wishlistUpdate"));
     setTimeout(() => setToast(null), 2000);
   };
@@ -103,12 +102,17 @@ const ProductDetails = () => {
             .then(platziData => {
               if (platziData) {
                 const cleanedImages = (platziData.images || []).map((img) => {
+                  let finalImg = img;
                   try {
                     const parsed = JSON.parse(img);
-                    return typeof parsed === 'string' ? parsed : img;
+                    finalImg = typeof parsed === 'string' ? parsed : img;
                   } catch {
-                    return img.replace(/[\[\]"']/g, '');
+                    finalImg = img.replace(/[\[\]"']/g, '');
                   }
+                  if (finalImg.includes("escuelajs.co") || finalImg.includes("placeimg.com")) {
+                    return "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800";
+                  }
+                  return finalImg;
                 });
                 setProduct({
                   ...platziData,

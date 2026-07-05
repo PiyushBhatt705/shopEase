@@ -473,7 +473,7 @@ app.get('/api/seller/store/:ownerId', async (req, res) => {
   
   const db = readLocalDb();
   const store = db.stores.find(s => s.ownerId === ownerId || s.owner_id === ownerId);
-  if (!store) return res.status(404).json({ message: 'Store not found' });
+  if (!store) return res.json(null);
   res.json(store);
 });
 

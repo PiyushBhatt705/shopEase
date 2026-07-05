@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { safeLocalStorage } from "../utils/safeStorage";
 
 export const CartContext = createContext();
 
@@ -6,13 +7,12 @@ const CartProvider = ({ children }) => {
 
   // 🧠 Load cart from localStorage (persistent cart)
   const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
+    return safeLocalStorage.getItem("cart", []);
   });
 
   // 💾 Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    safeLocalStorage.setItem("cart", cart);
   }, [cart]);
 
   // 🛒 ADD TO CART

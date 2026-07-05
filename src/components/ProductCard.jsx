@@ -5,6 +5,7 @@ import { Heart, AlertTriangle, Scale } from "lucide-react";
 import Toast from "../components/Toast";
 import { useCompare } from "../hooks/useCompare";
 import { soundService } from "../services/soundService";
+import { safeLocalStorage } from "../utils/safeStorage";
 
 const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" }) => {
   const navigate = useNavigate();
@@ -41,10 +42,8 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("wishlist");
-    if (saved) {
-      setWishlist(JSON.parse(saved));
-    }
+    const saved = safeLocalStorage.getItem("wishlist", []);
+    setWishlist(saved);
   }, []);
 
   const isWishlisted = (id) => wishlist.some((item) => item.id === id);
@@ -60,7 +59,7 @@ const ProductCard = ({ products, gridClass = "grid-cols-1 sm:grid-cols-2 md:grid
       setToast("Added to wishlist ❤️");
     }
     setWishlist(updated);
-    localStorage.setItem("wishlist", JSON.stringify(updated));
+    safeLocalStorage.setItem("wishlist", updated);
     window.dispatchEvent(new Event("wishlistUpdate"));
     setTimeout(() => setToast(null), 2000);
   };
