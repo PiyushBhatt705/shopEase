@@ -3,6 +3,7 @@ import ProductCard from "../components/ProductCard";
 import Button from "../components/Button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiService } from "../services/apiService";
+import SearchBar from "../components/SearchBar";
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
@@ -159,23 +160,17 @@ const AllProducts = () => {
           {/* Search Catalog Box */}
           <div className="bg-white p-5 rounded-2xl border border-gray-150 shadow-xs">
             <h3 className="font-bold text-gray-800 text-sm uppercase tracking-wider mb-4">Search Catalog</h3>
-            <div className="relative">
-              <input
-                type="text"
-                value={localSearch}
-                onChange={(e) => {
-                  setLocalSearch(e.target.value);
-                  setSearchParams({ search: e.target.value, filter: filterQuery });
-                }}
-                placeholder="Type to search..."
-                className="w-full bg-gray-50 border border-gray-205 rounded-xl p-3 pl-10 outline-none text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 font-semibold text-gray-700 shadow-sm"
-              />
-              <span className="absolute left-3.5 top-3.5 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </span>
-            </div>
+            <SearchBar
+              value={localSearch}
+              onChange={(e) => {
+                setLocalSearch(e.target.value);
+                setSearchParams({ search: e.target.value, filter: filterQuery });
+              }}
+              placeholder="Type to search..."
+              inputClassName="w-full bg-gray-50 border border-gray-205 rounded-xl p-3 pl-10 outline-none text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 font-semibold text-gray-700 shadow-sm"
+              iconClassName="left-3.5"
+              iconSize={18}
+            />
           </div>
           
           {/* Sorting Box */}

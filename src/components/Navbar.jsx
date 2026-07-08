@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {useCart} from "../hooks/useCart";
 import { apiService } from "../services/apiService";
 import Toast from "./Toast";
+import SearchBar from "./SearchBar";
 const Navbar = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -196,22 +197,20 @@ const Navbar = () => {
         {/* Right Side - Search and Icons */}
         <div className="flex items-center space-x-2 md:space-x-4 flex-grow md:flex-grow-0">
           {/* Search Bar - Visible on all screens with responsive width */}
-          <div className="relative flex-grow md:flex-grow-0 group">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && searchQuery.trim() !== "") {
-                  navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-                  setSearchQuery("");
-                }
-              }}
-              className="w-full md:w-48 lg:w-56 pl-9 pr-4 py-2 bg-gray-100 hover:bg-gray-50 rounded-full border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white focus:border-blue-400 focus:shadow-md transition-all duration-300 ease-in-out md:focus:w-64 lg:focus:w-72"
-            />
-          </div>
+          <SearchBar
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && searchQuery.trim() !== "") {
+                navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+                setSearchQuery("");
+              }
+            }}
+            placeholder="Search products..."
+            className="flex-grow md:flex-grow-0 group"
+            inputClassName="w-full md:w-48 lg:w-56 pl-9 pr-4 py-2 bg-gray-100 hover:bg-gray-50 rounded-full border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white focus:border-blue-400 focus:shadow-md transition-all duration-300 ease-in-out md:focus:w-64 lg:focus:w-72"
+            iconClassName="left-3 group-focus-within:text-blue-500"
+          />
 
           {/* Icons - Hidden on Mobile, visible on md and above */}
           <div className="hidden md:flex items-center space-x-3 lg:space-x-5">
