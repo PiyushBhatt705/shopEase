@@ -9,7 +9,8 @@ const Cart = () => {
     removeFromCart,
     clearCart,
     increaseQuantity,
-    decreaseQuantity
+    decreaseQuantity,
+    updateQuantity
   } = useCart();
 
   const navigate = useNavigate();
@@ -111,7 +112,23 @@ const Cart = () => {
                     -
                   </button>
 
-                  <span className="font-bold">{item.quantity}</span>
+                  <input
+                    type="number"
+                    value={item.quantity === 0 ? "" : item.quantity}
+                    onChange={(e) => {
+                      const val = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
+                      if (!isNaN(val)) {
+                        updateQuantity(item.id, Math.max(0, val));
+                      }
+                    }}
+                    onBlur={() => {
+                      if (item.quantity <= 0) {
+                        updateQuantity(item.id, 1);
+                      }
+                    }}
+                    className="w-10 text-center font-bold bg-transparent focus:outline-none text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    min="1"
+                  />
 
                   <button
                     onClick={() => increaseQuantity(item.id)}

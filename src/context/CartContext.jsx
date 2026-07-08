@@ -79,6 +79,17 @@ const CartProvider = ({ children }) => {
     );
   };
 
+  // ✏️ UPDATE QUANTITY DIRECTLY
+  const updateQuantity = (id, quantity) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === id
+          ? { ...item, quantity: Math.max(0, quantity) }
+          : item
+      )
+    );
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -87,7 +98,8 @@ const CartProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         increaseQuantity,
-        decreaseQuantity
+        decreaseQuantity,
+        updateQuantity
       }}
     >
       {children}
