@@ -141,7 +141,7 @@ function App() {
 
         {/* MAIN CONTENT */}
         <main className="flex-grow">
-
+          
           <Routes>
 
             {/* PUBLIC ROUTES */}
@@ -170,7 +170,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Checkout />
-                </ProtectedRoute>
+                </ProtectedRoute> 
               }
             />
             <Route

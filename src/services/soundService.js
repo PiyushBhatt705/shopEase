@@ -219,7 +219,7 @@ class SoundService {
         try {
           new Notification(title, {
             body: message,
-            icon: iconUrl || "https://placehold.co/128x128/3b82f6/ffffff?text=ShopEase"
+            icon: iconUrl || (window.location.origin + "/favicon.svg")
           });
         } catch (err) {
           console.error("Failed to spawn native notification:", err);
@@ -230,7 +230,7 @@ class SoundService {
             try {
               new Notification(title, {
                 body: message,
-                icon: iconUrl || "https://placehold.co/128x128/3b82f6/ffffff?text=ShopEase"
+                icon: iconUrl || (window.location.origin + "/favicon.svg")
               });
             } catch (err) {
               console.error("Failed to spawn native notification after request:", err);
