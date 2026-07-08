@@ -24,14 +24,7 @@ const allowedOrigins = [
   'https://shopease-aaqd.onrender.com'
 ];
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // Allow any vercel.app subdomain (preview deployments)
-    if (origin.endsWith('.vercel.app')) return callback(null, true);
-    return callback(new Error('CORS: origin not allowed'));
-  },
+  origin: true,
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
@@ -64,8 +57,11 @@ const writeLocalDb = (data) => {
 // Check if MongoDB is successfully connected
 let isMongoConnected = false;
 
+mongoose.set('bufferCommands', false);
+
 mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000 // 5 seconds timeout before falling back
+  serverSelectionTimeoutMS: 5000,
+  bufferCommands: false
 })
 .then(() => {
   isMongoConnected = true;

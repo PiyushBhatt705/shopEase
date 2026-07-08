@@ -86,6 +86,38 @@ const ProductDetails = () => {
   };
 
   useEffect(() => {
+    const fallbackToPlatzi = () => {
+      fetch(`https://api.escuelajs.co/api/v1/products/${id}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(platziData => {
+          if (platziData) {
+            const cleanedImages = (platziData.images || []).map((img) => {
+              let finalImg = img;
+              try {
+                const parsed = JSON.parse(img);
+                finalImg = typeof parsed === 'string' ? parsed : img;
+              } catch {
+                finalImg = img.replace(/[\[\]"']/g, '');
+              }
+              if (finalImg.includes("escuelajs.co") || finalImg.includes("placeimg.com")) {
+                return "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800";
+              }
+              return finalImg;
+            });
+            setProduct({
+              ...platziData,
+              id: id,
+              images: cleanedImages
+            });
+          } else {
+            setProduct({ error: true, message: "Product not found inside global fake store APIs." });
+          }
+        })
+        .catch(err => {
+          setProduct({ error: true, message: err.message || "Failed to fetch product from fallback APIs." });
+        });
+    };
+
     apiService.products.getById(id)
       .then((data) => {
         if (data) {
@@ -96,34 +128,13 @@ const ProductDetails = () => {
           };
           setProduct(finalProduct);
         } else {
-          // Fallback to Platzi Fake Store API directly
-          fetch(`https://api.escuelajs.co/api/v1/products/${id}`)
-            .then(res => res.ok ? res.json() : null)
-            .then(platziData => {
-              if (platziData) {
-                const cleanedImages = (platziData.images || []).map((img) => {
-                  let finalImg = img;
-                  try {
-                    const parsed = JSON.parse(img);
-                    finalImg = typeof parsed === 'string' ? parsed : img;
-                  } catch {
-                    finalImg = img.replace(/[\[\]"']/g, '');
-                  }
-                  if (finalImg.includes("escuelajs.co") || finalImg.includes("placeimg.com")) {
-                    return "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800";
-                  }
-                  return finalImg;
-                });
-                setProduct({
-                  ...platziData,
-                  id: id,
-                  images: cleanedImages
-                });
-              }
-            });
+          fallbackToPlatzi();
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.warn("Backend product lookup failed, attempting Platzi API fallback:", err.message);
+        fallbackToPlatzi();
+      });
   }, [id]);
 
   useEffect(() => {
@@ -131,6 +142,17 @@ const ProductDetails = () => {
       setSelectedImage(product.images[0])
     }
   }, [product])
+
+  if (product?.error) {
+    return (
+      <div className="max-w-md mx-auto my-20 p-6 bg-white border border-gray-200 rounded-2xl shadow-lg text-center flex flex-col items-center">
+        <AlertTriangle className="text-amber-500 w-16 h-16 mb-4 animate-bounce" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Product Not Found</h2>
+        <p className="text-gray-500 text-sm mb-6">{product.message || "We couldn't retrieve the details for this product."}</p>
+        <Button text="Return to Catalog" handleClick={() => navigate('/')} />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
